@@ -1,4 +1,5 @@
-(ns joplin.core)
+(ns joplin.core
+  (:require [ragtime.main]))
 
 (defmulti migrate-db
   "Migrate target database described by a joplin database map."
@@ -22,3 +23,10 @@
 (defn rollback [targets args] (run-op rollback-db targets args))
 (defn seed [targets args] (run-op seed-db targets args))
 (defn reset [targets args] (run-op reset-db targets args))
+
+(def verbose-migration @#'ragtime.main/verbose-migration)
+(defn load-var [v]
+  (try
+    (@#'ragtime.main/load-var v)
+    (catch Exception e
+      (println (format "Seed function '%s' not found" v)))))

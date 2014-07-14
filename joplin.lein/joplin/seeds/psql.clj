@@ -1,4 +1,4 @@
 (ns seeds.psql)
 
-(defn run [& args]
-  (println "seed!"))
+(defn run [target & args]
+  (println "PSQL seed" target args))

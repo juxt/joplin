@@ -1,5 +1,5 @@
 (defproject joplin "0.1.0-SNAPSHOT"
-  :description "Flexible datastore migrations and seeds"
+  :description "Flexible datastore migration and seeding"
   :url "http://github.com/martintrojer/joplin"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}

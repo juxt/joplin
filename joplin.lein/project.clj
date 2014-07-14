@@ -14,21 +14,23 @@
   ;; test
   :joplin {
            :migrators {
-                       :mig "joplin/migrators/psql"
+                       :pmig "joplin/migrators/psql"
                        }
            :seeds {
-                   :seed     "seeds.psql/run"
+                   :pseed "seeds.psql/run"
+                   :zseed "seeds.zk/run"
+
                    }
            :databases {
                        :psql-dev {:type :jdbc, :url "jdbc:h2:file:test_db";;"jdbc:h2:mem:test_db"
                                   }
                        :es-dev   {:type :es, :host "foo", :port 9200}
-                       :zk-dev   {:type :zk, :host "foo", :port 2181}
+                       :zk-dev   {:type :zk, :host "localhost", :port 2181}
                        }
            :environments {
-                          :dev     [{:db :psql-dev, :migrator :mig, :seed :seed}
+                          :dev     [{:db :psql-dev, :migrator :pmig, :seed :pseed}
                                     ;;{:db :es-dev, :migrator :pz-es-dev}
-                                    ;;{:db :zk-dev, :seed :pz-settings-dev}
+                                    {:db :zk-dev, :seed :zseed}
                                     ]
                           }
            }

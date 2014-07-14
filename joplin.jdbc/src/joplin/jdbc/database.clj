@@ -1,11 +1,7 @@
 (ns joplin.jdbc.database
   (:use [joplin.core])
   (:require [ragtime.core :as ragtime]
-            [ragtime.main]
             [ragtime.sql.files :as files]))
-
-(def verbose-migration @#'ragtime.main/verbose-migration)
-(def load-var @#'ragtime.main/load-var)
 
 (defn- get-migrations [path]
   (map verbose-migration (files/migrations path)))
@@ -29,14 +25,13 @@
   (let [db (get-db target)
         migrations (set (map :id (get-migrations (:migrator target))))
         applied (set (ragtime/applied-migration-ids db))
-        seed-fn (try (load-var (:seed target)) (catch Exception e))]
+        seed-fn (load-var (:seed target))]
 
     (when (not= (count migrations) (count applied))
       (println "There are" (- (count migrations) (count applied)) "pending migrations")
       (println (clojure.set/difference migrations applied))
       (System/exit 1))
     (when-not seed-fn
-      (println "Seed function" (:seed target) "not found")
       (System/exit 1))
 
     (apply seed-fn target args)))
