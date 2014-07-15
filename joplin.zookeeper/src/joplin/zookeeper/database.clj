@@ -34,9 +34,11 @@
   (when-let [seed-fn (load-var (:seed target))]
     (apply seed-fn target args)))
 
+(defmethod reset-db :zk [target & args]
+  (apply seed-db target args))
+
 ;; ========================
 ;; Dummy fns for migrations, doesn't really make sense for a k/v stores
 
 (defmethod migrate-db :zk [target & args])
 (defmethod rollback-db :zk [target & args])
-(defmethod reset-db :zk [target & args])

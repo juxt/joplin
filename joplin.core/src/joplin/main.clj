@@ -23,6 +23,8 @@
              (map (pop-key :migrator :migrators))
              (map (pop-key :seed :seeds)))))
 
+(defn- run-op [f targets args] (doseq [t targets] (apply f t args)))
+
 (def help-text
   "Manage Joplin migrations and seeds.
 
@@ -59,45 +61,11 @@ Options:
 
     ;; dispatch commands
     (condp = command
-      "migrate"  (migrate targets args)
-      "rollback" (rollback targets args)
-      "seed"     (seed targets args)
-      "reset"    (reset targets args)
-      "create"   (create targets args)
+      "migrate"  (run-op migrate-db targets args)
+      "rollback" (run-op rollback-db targets args)
+      "seed"     (run-op seed-db targets args)
+      "reset"    (run-op reset-db targets args)
+      "create"   (apply create-migration (first targets) args)
       "help"     (println help-text)
       (do (println help-text)
           (System/exit 1)))))
-
-
-(comment
-
-  (def test-options
-    {
-     :migrators {
-                 :pz-psql "migrators/psql"
-                 :pz-es   "migrators/es"
-                 }
-     :seeds {
-             :pz-psql-dev     "seeds.psql-dev/run"
-             :pz-psql-staging "seeds.psql-stg/run"
-             :pz-es-dev       "seeds.es-dev/run"
-             :pz-settings-dev "settings.dev/run"
-             }
-     :databases {
-                 :psql-dev {:type :jdbc, :url "jdbc:h2:mem:test_db"}
-                 :es-dev   {:type :es, :host "foo", :port 9200}
-                 :zk-dev   {:type :zk, :host "foo", :port 2181}
-                 }
-     :environments {
-                    :dev     [{:db :psql-dev, :migrator :pz-psql, :seed :pz-psql-dev}
-                              {:db :es-dev, :migrator :pz-es-dev}
-                              {:db :zk-dev, :seed :pz-settings-dev}]
-                    :staging [{:db :psql-dev, :migrator :pz-sql, :seed :pz-psql-dev}]
-                    }
-     })
-
-  (migrate
-   (get-targets test-options :dev nil)
-   {})
-
-  )

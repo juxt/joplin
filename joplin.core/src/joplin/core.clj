@@ -1,6 +1,10 @@
 (ns joplin.core
   (:require [clojure.java.io :as io]
+            [ragtime.core]
             [ragtime.main]))
+
+;; ==========================================================================
+;; methods implemented by migrator/seeder targets
 
 (defmulti migrate-db
   "Migrate target database described by a joplin database map."
@@ -23,16 +27,14 @@
   "Create migrations file(s) for target database described by a joplin database map."
   (fn [target options & args] (get-in target [:db :type])))
 
-(defn- run-op [f targets args] (doseq [t targets] (apply f t args)))
-(defn migrate [targets args] (run-op migrate-db targets args))
-(defn rollback [targets args] (run-op rollback-db targets args))
-(defn seed [targets args] (run-op seed-db targets args))
-(defn reset [targets args] (run-op reset-db targets args))
-(defn create [targets args] (run-op create-migration targets args))
+;; ==========================================================================
+;; Helpers
 
 (def verbose-migration @#'ragtime.main/verbose-migration)
 
-(defn load-var [v]
+(defn load-var
+  "Load a var specified by a string"
+  [v]
   (try
     (@#'ragtime.main/load-var v)
     (catch Exception e
@@ -49,9 +51,11 @@
          (map #(re-matches #"(.*)(\.clj)$" %))
          (keep second)
          sort
-         (map #(vector % (symbol (str ns "." %)))))))
+         (mapv #(vector % (symbol (str ns "." %)))))))
 
-(defn get-migrations [path]
+(defn get-migrations
+  "Get all seq of ragtime migrators given a path (will scan the filesystem)"
+  [path]
   (for [[id ns] (get-migration-ns path)]
     (do
       (require ns)
@@ -59,3 +63,42 @@
        {:id id
         :up (load-var (str ns "/up"))
         :down (load-var (str ns "/down"))}))))
+
+(defn do-rollback
+  "Perform a rollback on a database"
+  [migrations db n-str]
+  (doseq [m migrations]
+    (ragtime.core/remember-migration m))
+  (ragtime.core/rollback-last db (or (when n-str (Integer/parseInt n-str))
+                                     1)))
+
+(defn do-seed-fn
+  "Run a seeder function with migration check"
+  [migrations applied-migrations target args]
+  (let [seed-fn (load-var (:seed target))
+        migrations (set migrations)
+        applied-migrations (set applied-migrations)]
+
+    (when (not= (count migrations) (count applied-migrations))
+      (println "There are" (- (count migrations) (count applied-migrations)) "pending migrations")
+      (println (clojure.set/difference migrations applied-migrations))
+      (System/exit 1))
+
+    (when-not seed-fn
+      (System/exit 1))
+
+    (apply seed-fn target args)))
+
+(defn do-reset
+  "Perform a reset on a database"
+  [db target args]
+
+  ;; Roll back all
+  (while (not-empty (ragtime.core/applied-migration-ids db))
+    (apply rollback-db target args))
+
+  ;; Migrate
+  (apply migrate-db target args)
+
+  ;; Seed
+  (apply seed-db target args))
