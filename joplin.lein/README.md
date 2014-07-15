@@ -1,7 +1,5 @@
 # joplin
 
-## Usage
-
 ## License
 
 Copyright © 2014 Martin Trojer

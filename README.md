@@ -1,4 +1,4 @@
-# joplin.elasticsearch
+Flexible datastore migration and seeding
 
 ## License
 

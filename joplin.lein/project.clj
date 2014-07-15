@@ -1,4 +1,4 @@
-(defproject joplin.lein "0.1.0-SNAPSHOT"
+(defproject joplin.lein "0.1.0"
   :description "Flexible datastore migrations and seeds"
   :url "http://github.com/martintrojer/joplin"
   :license {:name "Eclipse Public License"
@@ -11,7 +11,7 @@
 
   :source-paths ["src" "joplin"]
 
-  ;; test
+  ;; Example usage
   :joplin {
            :migrators {
                        :pmig "joplin/migrators/psql"
