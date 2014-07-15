@@ -31,6 +31,7 @@ migrate env [db]    Migrate to the latest version
 rollback env db [n] Rollback n versions (defaults to 1)
 seed env [db]       Seed and environment with data
 reset env [db]      Re-apply all migrations and/or seeds
+create env db id    Create a new migration for a given migration id
 
 Options:
 -r  --require       Comma-separated list of namespaces to require")
@@ -62,6 +63,7 @@ Options:
       "rollback" (rollback targets args)
       "seed"     (seed targets args)
       "reset"    (reset targets args)
+      "create"   (create targets args)
       "help"     (println help-text)
       (do (println help-text)
           (System/exit 1)))))

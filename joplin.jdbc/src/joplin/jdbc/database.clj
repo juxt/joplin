@@ -3,7 +3,7 @@
   (:require [ragtime.core :as ragtime]
             [ragtime.sql.files :as files]))
 
-(defn- get-migrations [path]
+(defn- get-sql-migrations [path]
   (map verbose-migration (files/migrations path)))
 
 (defn- get-db [target]
@@ -12,18 +12,18 @@
 (defmethod migrate-db :jdbc [target & args]
   (ragtime/migrate-all
    (get-db target)
-   (get-migrations (:migrator target))))
+   (get-sql-migrations (:migrator target))))
 
 (defmethod rollback-db :jdbc [target & [_ n]]
   (let [db (get-db target)]
-    (doseq [m (get-migrations (:migrator target))]
+    (doseq [m (get-sql-migrations (:migrator target))]
       (ragtime/remember-migration m))
     (ragtime/rollback-last db (or (when n (Integer/parseInt n))
-                               1))))
+                                  1))))
 
 (defmethod seed-db :jdbc [target & args]
   (let [db (get-db target)
-        migrations (set (map :id (get-migrations (:migrator target))))
+        migrations (set (map :id (get-sql-migrations (:migrator target))))
         applied (set (ragtime/applied-migration-ids db))
         seed-fn (load-var (:seed target))]
 
@@ -46,3 +46,5 @@
 
   ;; Seed
   (apply seed-db target args))
+
+(defmethod create-migration :jdbc [target & args])
