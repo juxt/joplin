@@ -6,7 +6,7 @@
   :dependencies [[leinjacker "0.4.1"]]
   :eval-in-leiningen true
 
-  ;; Example usage
+   ;; Example usage
   :joplin {
            :migrators {
                        :pmig "joplin/migrators/psql"
