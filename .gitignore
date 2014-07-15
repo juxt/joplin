@@ -1,4 +1,11 @@
 target/
-*.db
+classes/
+checkouts/
 pom.xml
+pom.xml.asc
+*.jar
+*.class
+.lein-*
+.nrepl-port
+*.db
 *~
