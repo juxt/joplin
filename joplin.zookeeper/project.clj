@@ -1,4 +1,4 @@
-(defproject joplin.zookeeper "0.1.1"
+(defproject joplin.zookeeper "0.1.2"
   :description "Flexible datastore migration and seeding"
   :url "http://github.com/martintrojer/joplin"
   :license {:name "Eclipse Public License"
@@ -8,5 +8,5 @@
                  [org.apache.zookeeper/zookeeper "3.4.5" :exclusions [commons-codec com.sun.jmx/jmxri
                                                                       com.sun.jdmk/jmxtools javax.jms/jms
                                                                       org.slf4j/slf4j-log4j12 log4j]]
-                 [joplin.core "0.1.1"]
+                 [joplin.core "0.1.2"]
                  [curator "0.0.2"]])
