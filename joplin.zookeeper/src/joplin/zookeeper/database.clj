@@ -19,27 +19,42 @@
 ;; ==============================================================================
 ;; Raw / Curator / Exhibitor connection helpers
 
-(defn connect-raw [target]
+(defn- raw? [client]
+  (instance? org.apache.zookeeper.ZooKeeper client))
+
+(defn- connect-raw [target]
   (zk/connect (connection-string target) :timeout-msec 10000))
 
-(defn connect-curator [target]
+(defn- connect-curator [target]
   (when-let [client (curator-framework (connection-string target))]
     (.start client)
     client))
 
-(defn connect-exhibitor [target]
-  (when-let [client (exhibitor-framework (-> target :db :host) (-> target :db :port))]
+(defn- connect-exhibitor [target]
+  (when-let [client (exhibitor-framework (-> target :db :host)
+                                         (-> target :db :port))]
     (.start client)
     client))
 
-(defn close [client]
+(defn- close-raw [client]
   (zk/close client))
+
+(defn- close-curator [client]
+  (.close client))
+
+(defn connect [target]
+  (condp = (-> target :db :client)
+    :curator (connect-curator target)
+    :exhibitor (connect-exhibitor target)
+    (connect-raw target)))
+
+(defn close [client]
+  (if (raw? client)
+    (close-raw client)
+    (close-curator client)))
 
 ;; ==============================================================================
 ;; ZK-client helpers
-
-(defn- raw? [client]
-  (instance? org.apache.zookeeper.ZooKeeper client))
 
 (defn- write-data-raw [client path data]
   (when-not (zk/exists client path)

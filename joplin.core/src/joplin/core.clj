@@ -39,7 +39,8 @@
   (try
     (@#'ragtime.main/load-var v)
     (catch Exception e
-      (println (format "Function '%s' not found" v)))))
+      (println (format "Function '%s' not found" v))
+      (println (.getMessage e)))))
 
 (defn- get-migration-ns [path]
   (let [ns (->> (clojure.string/split path #"/")

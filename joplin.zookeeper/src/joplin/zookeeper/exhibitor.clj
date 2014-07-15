@@ -17,7 +17,7 @@
    (Exhibitors. [host] port
                 (proxy [Exhibitors$BackupConnectionStringProvider] []
                   (getBackupConnectionString []
-                    (str host ":" port))))
+                    (throw (Exception. "Can't connect to exhibitor")))))
    (DefaultExhibitorRestClient.)
    "/exhibitor/v1/cluster/list"
    5000 ;; Poll every
