@@ -7,6 +7,7 @@
   (:import [org.elasticsearch.action.admin.indices.settings.get GetSettingsRequest]
            [org.elasticsearch.client Client]))
 
+
 ;; ============================================================================
 ;; ES connection
 
@@ -210,10 +211,11 @@
                n))
 
 (defmethod seed-db :es [target & args]
-  (init (:db target))
-  (let [migrations (get-migrations (:migrator target))
-        applied (applied-migration-ids (->ElasticSearchDatabase))]
-    (do-seed-fn migrations applied target args)))
+  (when (:seed target)
+    (init (:db target))
+    (let [migrations (get-migrations (:migrator target))
+          applied (applied-migration-ids (->ElasticSearchDatabase))]
+      (do-seed-fn migrations applied target args))))
 
 (defmethod reset-db :es [target & args]
   (init (:db target))

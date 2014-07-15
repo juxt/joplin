@@ -77,20 +77,20 @@
 (defn do-seed-fn
   "Run a seeder function with migration check"
   [migrations applied-migrations target args]
-  (let [seed-fn (load-var (:seed target))
-        migrations (set migrations)
-        applied-migrations (set applied-migrations)]
+  (when-let [seed-fn (load-var (:seed target))]
+    (let [migrations (set migrations)
+          applied-migrations (set applied-migrations)]
 
-    (when (not= (count migrations) (count applied-migrations))
-      (println "There are" (- (count migrations) (count applied-migrations)) "pending migrations")
-      (println (clojure.set/difference migrations applied-migrations))
-      (System/exit 1))
+      (when (not= (count migrations) (count applied-migrations))
+        (println "There are" (- (count migrations) (count applied-migrations)) "pending migrations")
+        (println (clojure.set/difference migrations applied-migrations))
+        (System/exit 1))
 
-    (when-not seed-fn
-      (System/exit 1))
+      (when-not seed-fn
+        (System/exit 1))
 
-    (println "Appying seed function" (:seed target))
-    (apply seed-fn target args)))
+      (println "Appying seed function" (:seed target))
+      (apply seed-fn target args))))
 
 (defn do-reset
   "Perform a reset on a database"
