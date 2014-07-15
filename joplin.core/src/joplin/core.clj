@@ -1,7 +1,10 @@
 (ns joplin.core
-  (:require [clojure.java.io :as io]
+  (:require [clj-time.core :as t]
+            [clj-time.format :as f]
+            [clojure.java.io :as io]
             [clojure.set]
-            [ragtime.core]
+            [clojure.string]
+            [ragtime.core :refer [applied-migration-ids]]
             [ragtime.main]))
 
 ;; ==========================================================================
@@ -42,6 +45,9 @@
       (println (format "Function '%s' not found" v))
       (println (.getMessage e)))))
 
+(defn get-full-migrator-id [id]
+  (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
+
 (defn- get-migration-ns [path]
   (let [ns (->> (clojure.string/split path #"/")
                 rest
@@ -52,6 +58,7 @@
          (map #(.getName %))
          (map #(re-matches #"(.*)(\.clj)$" %))
          (keep second)
+         (map #(clojure.string/replace % "_" "-"))
          sort
          (mapv #(vector % (symbol (str ns "." %)))))))
 
@@ -69,6 +76,7 @@
 (defn do-rollback
   "Perform a rollback on a database"
   [migrations db n-str]
+  (println "**" migrations db n-str (applied-migration-ids db))
   (doseq [m migrations]
     (ragtime.core/remember-migration m))
   (ragtime.core/rollback-last db (or (when n-str (Integer/parseInt n-str))
@@ -82,7 +90,7 @@
           applied-migrations (set applied-migrations)]
 
       (when (not= (count migrations) (count applied-migrations))
-        (println "There are" (- (count migrations) (count applied-migrations)) "pending migrations")
+        (println "There are" (- (count migrations) (count applied-migrations)) "pending migration(s)")
         (println (clojure.set/difference migrations applied-migrations))
         (System/exit 1))
 

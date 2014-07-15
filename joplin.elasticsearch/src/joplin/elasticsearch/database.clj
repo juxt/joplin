@@ -1,12 +1,12 @@
 (ns joplin.elasticsearch.database
   (:use [joplin.core])
-  (:require [clojurewerkz.elastisch.native :as es]
+  (:require [clojure.string]
+            [clojurewerkz.elastisch.native :as es]
             [clojurewerkz.elastisch.native.document :as esd]
             [clojurewerkz.elastisch.native.index :as esi]
             [ragtime.core :refer [Migratable migrate-all applied-migration-ids]])
   (:import [org.elasticsearch.action.admin.indices.settings.get GetSettingsRequest]
            [org.elasticsearch.client Client]))
-
 
 ;; ============================================================================
 ;; ES connection
@@ -65,7 +65,8 @@
 (defn es-get-applied-migrations []
   (->> (es-get-applied)
        (sort-by second)
-       keys))
+       keys
+       (map name)))
 
 (defn es-add-migration-id [migration-id]
   (let [es-client (ensure-connected)]
@@ -76,12 +77,6 @@
   (let [es-client (ensure-connected)]
     (esd/put es-client migration-index migration-type migration-document-id
              {:migrations (dissoc (es-get-applied) migration-id)})))
-
-(comment
-
-  (init {:cluster "dev", :host "localhost", :port "9300"})
-
-  )
 
 ;; ============================================================================
 ;; Data migration
@@ -220,3 +215,24 @@
 (defmethod reset-db :es [target & args]
   (init (:db target))
   (do-reset (->ElasticSearchDatabase) target args))
+
+(defmethod create-migration :es [target & [_ _ id]]
+  (let [migration-id (get-full-migrator-id id)
+        path (str (:migrator target) "/"
+                  (clojure.string/replace migration-id "-" "_")
+                  ".clj")]
+    (println "creating" path)
+    (spit path (format "(ns %s
+  (:use [joplin.elasticsearch.database]))
+
+(defn up [target & args]
+  ;; TODO - up migration code here
+  )
+
+(defn down [target & args]
+  ;; TODO - down migration goes here
+  )
+" (apply str (interpose "."
+                        (concat
+                         (-> (:migrator target) (clojure.string/split #"/") rest)
+                         [migration-id])))))))
