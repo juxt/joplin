@@ -1,5 +1,6 @@
 (ns joplin.core
   (:require [clojure.java.io :as io]
+            [clojure.set]
             [ragtime.core]
             [ragtime.main]))
 
@@ -87,6 +88,7 @@
     (when-not seed-fn
       (System/exit 1))
 
+    (println "Appying seed function" (:seed target))
     (apply seed-fn target args)))
 
 (defn do-reset

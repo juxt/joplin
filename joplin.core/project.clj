@@ -1,4 +1,4 @@
-(defproject joplin.core "0.1.0"
+(defproject joplin.core "0.1.1"
   :description "Flexible datastore migration and seeding"
   :url "http://github.com/martintrojer/joplin"
   :license {:name "Eclipse Public License"
