@@ -76,7 +76,7 @@
 (defn es-remove-migration-id [migration-id]
   (let [es-client (ensure-connected)]
     (esd/put es-client migration-index migration-type migration-document-id
-             {:migrations (dissoc (es-get-applied) migration-id)})))
+             {:migrations (dissoc (es-get-applied) (keyword migration-id))})))
 
 ;; ============================================================================
 ;; Data migration
