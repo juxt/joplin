@@ -10,6 +10,6 @@
                  [joplin.jdbc "0.1.4-SNAPSHOT"]
                  [joplin.elasticsearch "0.1.4-SNAPSHOT"]
                  [joplin.zookeeper "0.1.4-SNAPSHOT"]
-                 [ragtime "0.3.7"]]
+                 [ragtime "0.3.6"]]
   :plugins [[lein-sub "0.3.0"]]
   :sub ["joplin.core" "joplin.jdbc" "joplin.elasticsearch" "joplin.zookeeper" "joplin.lein"])

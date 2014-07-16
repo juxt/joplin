@@ -76,7 +76,6 @@
 (defn do-rollback
   "Perform a rollback on a database"
   [migrations db n-str]
-  (println "**" migrations db n-str (applied-migration-ids db))
   (doseq [m migrations]
     (ragtime.core/remember-migration m))
   (ragtime.core/rollback-last db (or (when n-str (Integer/parseInt n-str))
