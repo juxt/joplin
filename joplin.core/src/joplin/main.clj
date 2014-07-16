@@ -68,4 +68,6 @@ Options:
       "create"   (apply create-migration (first targets) args)
       "help"     (println help-text)
       (do (println help-text)
-          (System/exit 1)))))
+          (System/exit 1)))
+
+    (System/exit 0)))

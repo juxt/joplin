@@ -1,7 +1,7 @@
 (ns joplin.datomic.database
   (:use [joplin.core])
   (:require [datomic.api :as d]
-            [ragtime.core :refer [Migratable migrate-all applied-migration-ids]]))
+            [ragtime.core :refer [Migratable]]))
 
 (defn transact-schema [conn schema]
   @(d/transact conn schema))
@@ -78,9 +78,7 @@
 ;; Joplin interface
 
 (defmethod migrate-db :dt [target & args]
-  (migrate-all
-   (->DTDatabase target)
-   (get-migrations (:migrator target))))
+  (do-migrate (get-migrations (:migrator target)) (->DTDatabase target)))
 
 (defmethod rollback-db :dt [target & [_ n]]
   (do-rollback (get-migrations (:migrator target))
@@ -88,9 +86,8 @@
                n))
 
 (defmethod seed-db :dt [target & args]
-  (let [migrations (get-migrations (:migrator target))
-        applied (applied-migration-ids (->DTDatabase target))]
-    (do-seed-fn migrations applied target args)))
+  (let [migrations (get-migrations (:migrator target))]
+    (do-seed-fn migrations (->DTDatabase target) target args)))
 
 (defmethod reset-db :dt [target & args]
   (do-reset (->DTDatabase target) target args))

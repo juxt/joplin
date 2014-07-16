@@ -4,7 +4,7 @@
             [clojure.java.io :as io]
             [clojure.set]
             [clojure.string]
-            [ragtime.core :refer [applied-migration-ids]]
+            [ragtime.core :refer [applied-migration-ids migrate-all]]
             [ragtime.main]))
 
 ;; ==========================================================================
@@ -73,9 +73,16 @@
         :up (load-var (str ns "/up"))
         :down (load-var (str ns "/down"))}))))
 
+(defn do-migrate
+  "Perform migration on a database"
+  [migrations db]
+  (println "Migrating" db)
+  (migrate-all db migrations))
+
 (defn do-rollback
-  "Perform a rollback on a database"
+  "Perform rollback on a database"
   [migrations db n-str]
+  (println "Rolling back" db)
   (doseq [m migrations]
     (ragtime.core/remember-migration m))
   (ragtime.core/rollback-last db (or (when n-str (Integer/parseInt n-str))
@@ -83,10 +90,11 @@
 
 (defn do-seed-fn
   "Run a seeder function with migration check"
-  [migrations applied-migrations target args]
+  [migrations db target args]
+  (println "Seeding" db)
   (when-let [seed-fn (load-var (:seed target))]
-    (let [migrations (set migrations)
-          applied-migrations (set applied-migrations)]
+    (let [migrations (->> migrations (map :id) set)
+          applied-migrations (->> (applied-migration-ids db) (map :id) set)]
 
       (cond
        (not= (count migrations) (count applied-migrations))

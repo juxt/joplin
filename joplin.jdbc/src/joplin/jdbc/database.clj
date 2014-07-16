@@ -10,9 +10,7 @@
   (ragtime/connection (get-in target [:db :url])))
 
 (defmethod migrate-db :jdbc [target & args]
-  (ragtime/migrate-all
-   (get-db target)
-   (get-sql-migrations (:migrator target))))
+  (do-migrate (get-sql-migrations (:migrator target)) (get-db target)))
 
 (defmethod rollback-db :jdbc [target & [_ n]]
   (do-rollback (get-sql-migrations (:migrator target))
@@ -20,9 +18,8 @@
                n))
 
 (defmethod seed-db :jdbc [target & args]
-  (let [migrations (map :id (get-sql-migrations (:migrator target)))
-        applied (ragtime/applied-migration-ids (get-db target))]
-    (do-seed-fn migrations applied target args)))
+  (let [migrations (get-sql-migrations (:migrator target))]
+    (do-seed-fn migrations (get-db target) target args)))
 
 (defmethod reset-db :jdbc [target & args]
   (do-reset (get-db target) target args))

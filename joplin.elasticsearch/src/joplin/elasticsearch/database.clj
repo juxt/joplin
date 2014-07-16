@@ -4,7 +4,7 @@
             [clojurewerkz.elastisch.native :as es]
             [clojurewerkz.elastisch.native.document :as esd]
             [clojurewerkz.elastisch.native.index :as esi]
-            [ragtime.core :refer [Migratable migrate-all applied-migration-ids]])
+            [ragtime.core :refer [Migratable]])
   (:import [org.elasticsearch.action.admin.indices.settings.get GetSettingsRequest]
            [org.elasticsearch.client Client]))
 
@@ -29,7 +29,7 @@
       .actionGet))
 
 (defn init [{:keys [cluster host port]}]
-  (println "Migrating server" cluster host port)
+  (println "Connecting to ES server" cluster host port)
   (when-not *es-client*
     (println "Building an es client")
     (let [client (es/connect [[host port]] {"cluster.name" cluster})]
@@ -184,7 +184,7 @@
 ;; ============================================================================
 ;; Ragtime interface
 
-(defrecord ElasticSearchDatabase []
+(defrecord ElasticSearchDatabase [host port cluster]
   Migratable
   (add-migration-id [db id]
     (es-add-migration-id id))
@@ -193,31 +193,30 @@
   (applied-migration-ids [db]
     (es-get-applied-migrations)))
 
+(defn ->ESDatabase [target]
+  (map->ElasticSearchDatabase (select-keys (:db target) [:host :port :cluster])))
+
 ;; ============================================================================
 ;; Joplin interface
 
 (defmethod migrate-db :es [target & args]
   (init (:db target))
-  (migrate-all
-   (->ElasticSearchDatabase)
-   (get-migrations (:migrator target))))
+  (do-migrate (get-migrations (:migrator target)) (->ESDatabase target)))
 
 (defmethod rollback-db :es [target & [_ n]]
   (init (:db target))
   (do-rollback (get-migrations (:migrator target))
-               (->ElasticSearchDatabase)
+               (->ESDatabase target)
                n))
 
 (defmethod seed-db :es [target & args]
-  (when (:seed target)
-    (init (:db target))
-    (let [migrations (get-migrations (:migrator target))
-          applied (applied-migration-ids (->ElasticSearchDatabase))]
-      (do-seed-fn migrations applied target args))))
+  (init (:db target))
+  (let [migrations (get-migrations (:migrator target))]
+    (do-seed-fn migrations (->ESDatabase target) target args)))
 
 (defmethod reset-db :es [target & args]
   (init (:db target))
-  (do-reset (->ElasticSearchDatabase) target args))
+  (do-reset (->ESDatabase target) target args))
 
 (defmethod create-migration :es [target & [_ _ id]]
   (do-create-migration target id "joplin.elasticsearch.database"))
