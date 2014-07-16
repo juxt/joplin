@@ -78,7 +78,6 @@
 ;; Joplin interface
 
 (defmethod migrate-db :dt [target & args]
-  (println "DT" target)
   (migrate-all
    (->DTDatabase target)
    (get-migrations (:migrator target))))

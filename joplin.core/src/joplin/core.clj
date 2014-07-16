@@ -88,16 +88,19 @@
     (let [migrations (set migrations)
           applied-migrations (set applied-migrations)]
 
-      (when (not= (count migrations) (count applied-migrations))
-        (println "There are" (- (count migrations) (count applied-migrations)) "pending migration(s)")
-        (println (clojure.set/difference migrations applied-migrations))
-        (System/exit 1))
+      (cond
+       (not= (count migrations) (count applied-migrations))
+       (do
+         (println "There are" (- (count migrations) (count applied-migrations)) "pending migration(s)")
+         (println (clojure.set/difference migrations applied-migrations)))
 
-      (when-not seed-fn
-        (System/exit 1))
+       seed-fn
+       (do
+         (println "Appying seed function" (:seed target))
+         (apply seed-fn target args))
 
-      (println "Appying seed function" (:seed target))
-      (apply seed-fn target args))))
+       :else
+       (println "Skipping" (:seed target))))))
 
 (defn do-reset
   "Perform a reset on a database"
