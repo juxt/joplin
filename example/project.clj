@@ -1,18 +1,22 @@
-(defproject joplin-example "0.1.4"
+(defproject joplin-example "0.1.5-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.h2database/h2 "1.3.160"]]
-  :plugins [[joplin.lein "0.1.4"]]
+  :plugins [[joplin.lein "0.1.5-SNAPSHOT"]]
 
   :source-paths ["src" "joplin"]
 
   :joplin {
            :migrators {:sql-mig "joplin/migrators/sql"
-                       :es-mig "joplin/migrators/es"}
+                       :es-mig "joplin/migrators/es"
+                       :dt-mig "joplin/migrators/datomic"}
            :seeds {:sql-seed "seeds.sql/run"
                    :es-seed "seeds.es/run"
+                   :dt-seed "seeds.dt/run"
                    :zk-seed "seeds.zk/run"}
            :databases {:sql-dev  {:type :jdbc, :url "jdbc:h2:mem:test"}
                        :sql-prod {:type :jdbc, :url "jdbc:h2:file:prod"}
+
+                       :dt-dev {:type :dt, :url "datomic:mem://test"}
 
                        :es-dev   {:type :es, :host "localhost", :port 9300, :cluster "dev"}
                        :es-prod  {:type :es, :host "es-prod", :port 9300, :cluster "dev"}
@@ -22,6 +26,7 @@
 
            :environments {:dev [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}
                                 {:db :es-dev, :migrator :es-mig, :seed :es-seed}
+                                {:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
                                 {:db :zk-dev, :seed :zk-seed}]
                           :prod [{:db :sql-prod, :migrator :sql-mig, :seed :sql-seed}
                                  {:db :es-prod, :migrator :es-mig}

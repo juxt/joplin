@@ -112,3 +112,26 @@
 
   ;; Seed
   (apply seed-db target args))
+
+(defn do-create-migration
+  "Create a scaffold migrator file"
+  [target id ns]
+  (let [migration-id (get-full-migrator-id id)
+        path (str (:migrator target) "/"
+                  (clojure.string/replace migration-id "-" "_")
+                  ".clj")]
+    (println "creating" path)
+    (spit path (format "(ns %s
+  (:use [%s]))
+
+(defn up [db]
+  ;; TODO - up migration code here
+  )
+
+(defn down [db]
+  ;; TODO - down migration goes here
+  )
+" (apply str (interpose "."
+                        (concat
+                         (-> (:migrator target) (clojure.string/split #"/") rest)
+                         [migration-id]))) ns))))

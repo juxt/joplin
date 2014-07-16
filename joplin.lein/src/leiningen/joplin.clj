@@ -4,11 +4,12 @@
 
 (defn- add-joplin-deps [project]
   (-> project
-      (deps/add-if-missing '[joplin.core "0.1.4"])
+      (deps/add-if-missing '[joplin.core "0.1.5-SNAPSHOT"])
       ;; TODO -- leave out
-      (deps/add-if-missing '[joplin.jdbc "0.1.4"])
-      (deps/add-if-missing '[joplin.elasticsearch "0.1.4"])
-      (deps/add-if-missing '[joplin.zookeeper "0.1.4"])))
+      (deps/add-if-missing '[joplin.jdbc "0.1.5-SNAPSHOT"])
+      (deps/add-if-missing '[joplin.elasticsearch "0.1.5-SNAPSHOT"])
+      (deps/add-if-missing '[joplin.zookeeper "0.1.5-SNAPSHOT"])
+      (deps/add-if-missing '[joplin.datomic "0.1.5-SNAPSHOT"])))
 
 (defn joplin
   "Migrate and seed datastores"
@@ -20,7 +21,7 @@
         project      (add-joplin-deps project)]
     (apply run project
            "-m" "joplin.main"
-           "-r" "joplin.jdbc.database,joplin.elasticsearch.database,joplin.zookeeper.database"
+           "-r" "joplin.jdbc.database,joplin.elasticsearch.database,joplin.zookeeper.database,joplin.datomic.database"
            "-e" environments
            "-d" databases
            "-m" migrators

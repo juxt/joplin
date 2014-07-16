@@ -1,5 +1,5 @@
-(defproject joplin.zookeeper "0.1.4"
-  :description "Flexible datastore migration and seeding"
+(defproject joplin.zookeeper "0.1.5-SNAPSHOT"
+  :description "ZooKeeper support for Joplin"
   :url "http://github.com/martintrojer/joplin"
   :scm {:name "git"
         :url "https://github.com/martintrojer/joplin"}
@@ -10,5 +10,5 @@
                  [org.apache.zookeeper/zookeeper "3.4.5" :exclusions [commons-codec com.sun.jmx/jmxri
                                                                       com.sun.jdmk/jmxtools javax.jms/jms
                                                                       org.slf4j/slf4j-log4j12 log4j]]
-                 [joplin.core "0.1.4"]
+                 [joplin.core "0.1.5-SNAPSHOT"]
                  [curator "0.0.2"]])

@@ -193,6 +193,9 @@
   (applied-migration-ids [db]
     (es-get-applied-migrations)))
 
+;; ============================================================================
+;; Joplin interface
+
 (defmethod migrate-db :es [target & args]
   (init (:db target))
   (migrate-all
@@ -217,22 +220,4 @@
   (do-reset (->ElasticSearchDatabase) target args))
 
 (defmethod create-migration :es [target & [_ _ id]]
-  (let [migration-id (get-full-migrator-id id)
-        path (str (:migrator target) "/"
-                  (clojure.string/replace migration-id "-" "_")
-                  ".clj")]
-    (println "creating" path)
-    (spit path (format "(ns %s
-  (:use [joplin.elasticsearch.database]))
-
-(defn up [target & args]
-  ;; TODO - up migration code here
-  )
-
-(defn down [target & args]
-  ;; TODO - down migration goes here
-  )
-" (apply str (interpose "."
-                        (concat
-                         (-> (:migrator target) (clojure.string/split #"/") rest)
-                         [migration-id])))))))
+  (do-create-migration target id "joplin.elasticsearch.database"))
