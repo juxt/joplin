@@ -4,7 +4,7 @@ Joplin is a library for flexible datastore migration and seeding.
 
 Joplin tries to solve the problems that arise when dealing with complicated systems consisting of multiple datastores. It lets you define and reason about environments (for instance dev, staging, UAT, prod).
 
-Joplin lets you declare your `databases`, `migrators`, `seed functions` up front and them combined them in different `environments`. It can be used via a [leiningen](http://leiningen.org) plugin or be called programatically.
+Joplin lets you declare your `databases`, `migrators`, `seed functions` up front and combine them in different `environments`. It can be used via a [leiningen](http://leiningen.org) plugin or be called programatically.
 
 Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
 
