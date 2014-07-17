@@ -4,11 +4,11 @@
             [clojure.java.io :as io]
             [clojure.set]
             [clojure.string]
-            [ragtime.core :refer [applied-migration-ids migrate-all]]
+            [ragtime.core]
             [ragtime.main]))
 
 ;; ==========================================================================
-;; methods implemented by migrator/seeder targets
+;; methods implemented by migrator/seed targets
 
 (defmulti migrate-db
   "Migrate target database described by a joplin database map."
@@ -77,7 +77,7 @@
   "Perform migration on a database"
   [migrations db]
   (println "Migrating" db)
-  (migrate-all db migrations))
+  (ragtime.core/migrate-all db migrations))
 
 (defn do-rollback
   "Perform rollback on a database"
@@ -94,7 +94,7 @@
   (println "Seeding" db)
   (when-let [seed-fn (load-var (:seed target))]
     (let [migrations (->> migrations (map :id) set)
-          applied-migrations (->> (applied-migration-ids db) (map :id) set)]
+          applied-migrations (set (ragtime.core/applied-migration-ids db))]
 
       (cond
        (not= (count migrations) (count applied-migrations))
