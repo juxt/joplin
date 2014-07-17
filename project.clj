@@ -11,6 +11,7 @@
                  [joplin.elasticsearch "0.1.5-SNAPSHOT"]
                  [joplin.zookeeper "0.1.5-SNAPSHOT"]
                  [joplin.datomic "0.1.5-SNAPSHOT"]
+                 [joplin.cassandra "0.1.5-SNAPSHOT"]
                  [ragtime "0.3.6"]]
   :plugins [[lein-sub "0.3.0"]]
   :sub ["joplin.core" "joplin.jdbc" "joplin.elasticsearch" "joplin.zookeeper"
