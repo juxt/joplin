@@ -12,7 +12,7 @@
 (defmethod migrate-db :jdbc [target & args]
   (do-migrate (get-sql-migrations (:migrator target)) (get-db target)))
 
-(defmethod rollback-db :jdbc [target & [_ n]]
+(defmethod rollback-db :jdbc [target & [_ _ n]]
   (do-rollback (get-sql-migrations (:migrator target))
                (get-db target)
                n))

@@ -115,8 +115,7 @@
   [db target args]
 
   ;; Roll back all
-  (while (not-empty (ragtime.core/applied-migration-ids db))
-    (apply rollback-db target args))
+  (ragtime.core/rollback-last db Integer/MAX_VALUE)
 
   ;; Migrate
   (apply migrate-db target args)
