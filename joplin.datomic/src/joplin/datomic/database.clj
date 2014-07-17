@@ -46,8 +46,7 @@
       (ensure-migration-schema conn)
       @(d/transact conn [{:db/id #db/id [:db.part/user -100]
                           :migrations/id id
-                          :migrations/created-at (java.util.Date.)}])
-      (d/shutdown true)))
+                          :migrations/created-at (java.util.Date.)}])))
   (remove-migration-id [db id]
     (when-let [conn (get-connection (:url db))]
       (ensure-migration-schema conn)
@@ -56,20 +55,17 @@
                                    :where
                                    [?e :migrations/id ?id]]
                                  (d/db conn) id))]
-        @(d/transact conn [[:db.fn/retractEntity mig]])
-        (d/shutdown true))))
+        @(d/transact conn [[:db.fn/retractEntity mig]]))))
   (applied-migration-ids [db]
     (when-let [conn (get-connection (:url db))]
       (ensure-migration-schema conn)
-      (let [res (->> (d/q '[:find ?id ?created-at
-                            :where
-                            [?e :migrations/id ?id]
-                            [?e :migrations/created-at ?created-at]]
-                          (d/db conn))
-                     (sort-by second)
-                     (map first))]
-        (d/shutdown true)
-        res))))
+      (->> (d/q '[:find ?id ?created-at
+                  :where
+                  [?e :migrations/id ?id]
+                  [?e :migrations/created-at ?created-at]]
+                (d/db conn))
+           (sort-by second)
+           (map first)))))
 
 (defn- ->DTDatabase [target]
   (->DatomicDatabase (-> target :db :url)))

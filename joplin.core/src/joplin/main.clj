@@ -70,4 +70,5 @@ Options:
       (do (println help-text)
           (System/exit 1)))
 
+    ;; Some plugins (datomic, cassandra) hold onto threads that makes joplin hang at this point
     (System/exit 0)))
