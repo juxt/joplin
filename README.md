@@ -28,17 +28,44 @@ Add joplin.core as a dependency if you just want the database-independent core:
 :dependencies [[joplin.core "0.1.5-SNAPSHOT"]]
 ```
 
-Or add the full library if you want support for ES/SQL/DT/ZK databases:
+Or add the full library if you want support for ES/SQL/DT/CASS/ZK databases:
 
 ```clojure
 :dependencies [[joplin "0.1.5-SNAPSHOT"]]
 ```
+
+You can also cherry-pick the plugins you need to minimize the dependencies in your classpath. Just include `joplin.core` and the plugins you are interested in.
 
 If you want to integrate Joplin into Leiningen:
 
 ```clojure
 :plugins [[joplin.lein "0.1.5-SNAPSHOT"]]
 ```
+
+`joplin.lein` will only add dependencies for the plugins that you are using, i.e. the type of the databases you have defined.
+
+## Usage
+
+### Using Joplin with Leiningen
+
+To use `joplin.lein` you need to define a key called `:joplin` in your `project.clj`. See the [example project](https://github.com/juxt/joplin/blob/master/example/project.clj#L8).
+
+The value of this key must be a map containing the keys `:databases`, `:migrators`, `:seeds` and `:environments`. The first three are pure declarations and `:environments` is where these declarations gets combined. For more details on these 4 keys see the [Concepts](https://github.com/martintrojer/joplin/wiki/concepts).
+
+Once the `:joplin` map has been defined, you can use the joplin leiningen plugin. The plugin comes with 5 commands;
+
+- `lein joplin migrate ENV [DB]`
+
+This command runs all pending (up) migrations on either all databases in the environment of a signle if the DB param us provided. This operation is idempotent.
+
+- `lein joplin seed ENV [DB]`
+
+This command run the seed functions on either all databases in the environemnt or a single if the DB param is provided. This operation is NOT idempotent, running seed functions multiple time can lead to duplication of data.
+
+Joplin will only run seed functions on databases that have been fully migrated, i.e. have no pending migrations.
+
+
+### Calling Joplin from your code
 
 ## Documentation
 
