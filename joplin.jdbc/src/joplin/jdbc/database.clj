@@ -24,7 +24,7 @@
 (defmethod reset-db :jdbc [target & args]
   (do-reset (get-db target) target args))
 
-(defmethod create-migration :jdbc [target & [_ _ id]]
+(defmethod create-migration :jdbc [target & [id]]
   (let [migration-id (get-full-migrator-id id)
         path-up (str (:migrator target) "/" migration-id ".up.sql")
         path-down (str (:migrator target) "/" migration-id ".down.sql")]

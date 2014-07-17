@@ -25,11 +25,12 @@ N is an optional argument and if present should be the first in args."
 
 (defmulti reset-db
   "Reset (re-migrate and seed) target database described by a joplin database map."
-  (fn [target options & args] (get-in target [:db :type])))
+  (fn [target & args] (get-in target [:db :type])))
 
 (defmulti create-migration
-  "Create migrations file(s) for target database described by a joplin database map."
-  (fn [target options & args] (get-in target [:db :type])))
+  "Create migrations file(s) for target database described by a joplin database map.
+The first argument must be the name of the migration to create"
+  (fn [target & args] (get-in target [:db :type])))
 
 ;; ==========================================================================
 ;; Helpers
@@ -49,18 +50,19 @@ N is an optional argument and if present should be the first in args."
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
 (defn- get-migration-ns [path]
-  (let [ns (->> (clojure.string/split path #"/")
-                rest
-                (interpose ".")
-                (apply str))
-        folder (io/file path)]
-    (->> (.listFiles folder)
-         (map #(.getName %))
-         (map #(re-matches #"(.*)(\.clj)$" %))
-         (keep second)
-         (map #(clojure.string/replace % "_" "-"))
-         sort
-         (mapv #(vector % (symbol (str ns "." %)))))))
+  (when path
+    (let [ns (->> (clojure.string/split path #"/")
+                  rest
+                  (interpose ".")
+                  (apply str))
+          folder (io/file path)]
+      (->> (.listFiles folder)
+           (map #(.getName %))
+           (map #(re-matches #"(.*)(\.clj)$" %))
+           (keep second)
+           (map #(clojure.string/replace % "_" "-"))
+           sort
+           (mapv #(vector % (symbol (str ns "." %))))))))
 
 (defn get-migrations
   "Get all seq of ragtime migrators given a path (will scan the filesystem)"
@@ -126,12 +128,13 @@ N is an optional argument and if present should be the first in args."
 (defn do-create-migration
   "Create a scaffold migrator file"
   [target id ns]
-  (let [migration-id (get-full-migrator-id id)
-        path (str (:migrator target) "/"
-                  (clojure.string/replace migration-id "-" "_")
-                  ".clj")]
-    (println "creating" path)
-    (spit path (format "(ns %s
+  (when (:migrator target)
+    (let [migration-id (get-full-migrator-id id)
+          path (str (:migrator target) "/"
+                    (clojure.string/replace migration-id "-" "_")
+                    ".clj")]
+      (println "creating" path)
+      (spit path (format "(ns %s
   (:use [%s]))
 
 (defn up [db]
@@ -144,4 +147,4 @@ N is an optional argument and if present should be the first in args."
 " (apply str (interpose "."
                         (concat
                          (-> (:migrator target) (clojure.string/split #"/") rest)
-                         [migration-id]))) ns))))
+                         [migration-id]))) ns)))))

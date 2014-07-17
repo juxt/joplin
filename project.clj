@@ -14,4 +14,4 @@
                  [ragtime "0.3.6"]]
   :plugins [[lein-sub "0.3.0"]]
   :sub ["joplin.core" "joplin.jdbc" "joplin.elasticsearch" "joplin.zookeeper"
-        "joplin.datomic" "joplin.lein"])
+        "joplin.datomic" "joplin.cassandra" "joplin.lein"])

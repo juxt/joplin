@@ -6,13 +6,14 @@ Joplin tries to solve the problems that arise when dealing with complicated syst
 
 Joplin lets you declare your `databases`, `migrators`, `seed functions` up front and combine them in different `environments`. It can be used via a [leiningen](http://leiningen.org) plugin or be called programatically.
 
-Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
+Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch, Cassandra and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
 
 Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 
 ## Libraries
 
 * joplin.core - database independent tools and functions for managing migrations and seeds
+* joplin.cassandra - migrate and seed [Cassandra](http://cassandra.apache.org) clusters
 * joplin.datomic - migrate and seed [Datomic](http://datomic.com) databases
 * joplin.elasticsearch - migrate and seed [Elasticsearch](http://elasticsearch.org) clusters
 * joplin.jdbc - migrate and seed SQL databses with jdbc

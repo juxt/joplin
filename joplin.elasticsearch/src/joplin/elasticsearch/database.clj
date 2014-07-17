@@ -218,5 +218,5 @@
   (init (:db target))
   (do-reset (->ESDatabase target) target args))
 
-(defmethod create-migration :es [target & [_ _ id]]
+(defmethod create-migration :es [target & [id]]
   (do-create-migration target id "joplin.elasticsearch.database"))

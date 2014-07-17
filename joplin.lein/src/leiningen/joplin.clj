@@ -6,6 +6,7 @@
 
 (def libs
   {:dt   "joplin.datomic"
+   :cass "joplin.cassandra"
    :jdbc "joplin.jdbc"
    :es   "joplin.elasticsearch"
    :zk   "joplin.zookeeper"})
@@ -29,6 +30,7 @@
     (-> project
         (deps/add-if-missing '[joplin.core "0.1.5-SNAPSHOT"])
         (add-dep :dt types)
+        (add-dep :cass types)
         (add-dep :jdbc types)
         (add-dep :es types)
         (add-dep :zk types))))
