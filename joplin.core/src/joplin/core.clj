@@ -15,8 +15,8 @@
   (fn [target & args] (get-in target [:db :type])))
 
 (defmulti rollback-db
-  "Rollback target database described by a joplin database map N steps
-(N defaults to 1, and is optionally present in the args)."
+  "Rollback target database described by a joplin database map N steps.
+N is an optional argument and if present should be the first in args."
   (fn [target & args] (get-in target [:db :type])))
 
 (defmulti seed-db

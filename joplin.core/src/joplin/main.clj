@@ -30,9 +30,9 @@
 
 Commands:
 migrate env [db]    Migrate to the latest version
-rollback env db [n] Rollback n versions (defaults to 1)
 seed env [db]       Seed and environment with data
-reset env [db]      Re-apply all migrations and/or seeds
+rollback env db [n] Rollback n versions (defaults to 1)
+reset env db        Re-apply all migrations and/or seeds
 create env db id    Create a new migration for a given migration id
 
 Options:
@@ -43,7 +43,10 @@ Options:
   (let [[conf [command & args]] (parse-args args)
         environment             (keyword (first args))
         database                (keyword (second args))
-        targets                 (get-targets conf environment database)]
+        targets                 (get-targets conf environment database)
+
+        args-to-drop            (count (remove nil? [environment database]))
+        clean-args              (drop args-to-drop args)]
 
     (when (empty? (get-in conf [:environments environment]))
       (println (format "Could not find environment '%s'" environment))
@@ -55,17 +58,24 @@ Options:
       (println "Could not find any matching targets")
       (System/exit 1))
 
+    (when (and (#{"rollback", "reset", "create"} command)
+               (nil? database))
+      (println "This command requires a valid database")
+      (System/exit 1))
+
     ;; require namespaces
     (doseq [ns (seq (ragtime/parse-namespaces conf))]
       (require ns))
 
     ;; dispatch commands
     (condp = command
-      "migrate"  (run-op migrate-db targets args)
-      "rollback" (run-op rollback-db targets args)
-      "seed"     (run-op seed-db targets args)
-      "reset"    (run-op reset-db targets args)
-      "create"   (apply create-migration (first targets) args)
+      "migrate"  (run-op migrate-db targets clean-args)
+      "seed"     (run-op seed-db targets clean-args)
+
+      "rollback" (apply rollback-db (first targets) clean-args)
+      "reset"    (apply reset-db (first targets) clean-args)
+      "create"   (apply create-migration (first targets) clean-args)
+
       "help"     (println help-text)
       (do (println help-text)
           (System/exit 1)))

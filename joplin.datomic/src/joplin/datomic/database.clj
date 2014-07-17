@@ -76,7 +76,7 @@
 (defmethod migrate-db :dt [target & args]
   (do-migrate (get-migrations (:migrator target)) (->DTDatabase target)))
 
-(defmethod rollback-db :dt [target & [_ _ n]]
+(defmethod rollback-db :dt [target & [n]]
   (do-rollback (get-migrations (:migrator target))
                (->DTDatabase target)
                n))

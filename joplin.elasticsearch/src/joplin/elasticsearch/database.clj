@@ -203,7 +203,7 @@
   (init (:db target))
   (do-migrate (get-migrations (:migrator target)) (->ESDatabase target)))
 
-(defmethod rollback-db :es [target & [_ _ n]]
+(defmethod rollback-db :es [target & [n]]
   (init (:db target))
   (do-rollback (get-migrations (:migrator target))
                (->ESDatabase target)
