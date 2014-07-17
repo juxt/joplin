@@ -88,7 +88,7 @@
 
 (defn delete-data [client path]
   (if (raw? client)
-    (read-data-raw client path)
+    (delete-data-raw client path)
     (println "joplin.zookeeper: no delete implementation for curator connections")))
 
 ;; ==============================================================================
