@@ -92,7 +92,7 @@
   "Run a seeder function with migration check"
   [migrations db target args]
   (println "Seeding" db)
-  (when-let [seed-fn (load-var (:seed target))]
+  (when-let [seed-fn (and (:seed target) (load-var (:seed target)))]
     (let [migrations (->> migrations (map :id) set)
           applied-migrations (set (ragtime.core/applied-migration-ids db))]
 
