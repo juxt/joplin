@@ -134,7 +134,8 @@ The first argument must be the name of the migration to create"
                     (clojure.string/replace migration-id "-" "_")
                     ".clj")]
       (println "creating" path)
-      (spit path (format "(ns %s
+      (try
+        (spit path (format "(ns %s
   (:use [%s]))
 
 (defn up [db]
@@ -147,4 +148,6 @@ The first argument must be the name of the migration to create"
 " (apply str (interpose "."
                         (concat
                          (-> (:migrator target) (clojure.string/split #"/") rest)
-                         [migration-id]))) ns)))))
+                         [migration-id]))) ns))
+        (catch Exception e
+          (println "Error creating file" path))))))
