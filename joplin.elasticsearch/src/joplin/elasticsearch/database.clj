@@ -165,7 +165,7 @@
 
 (defn- drop-index [alias-name & indexes]
   (let [es-client (ensure-connected)]
-    (esi/update-aliases es-client (map #(hash-map :remove {:index % :alias alias-name}) indexes))
+    (esi/update-aliases es-client (map #(hash-map :remove {:index % :aliases alias-name}) indexes))
     (doseq [index indexes]
       (esi/delete es-client index))))
 
