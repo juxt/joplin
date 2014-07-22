@@ -1,8 +1,8 @@
 (defproject joplin.lein "0.1.7-SNAPSHOT"
   :description "Joplin Leiningen plugin"
-  :url "http://github.com/martintrojer/joplin"
+  :url "http://github.com/juxt/joplin"
   :scm {:name "git"
-        :url "https://github.com/martintrojer/joplin"}
+        :url "https://github.com/juxt/joplin"}
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[leinjacker "0.4.1"]]
