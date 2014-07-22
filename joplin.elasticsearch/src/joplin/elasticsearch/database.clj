@@ -87,14 +87,15 @@
   ([old-index mapping-type new-index trans-f]
      (let [es-client (ensure-connected)]
        (dorun
-        (->> (esd/search old-index
+        (->> (esd/search es-client
+                         old-index
                          mapping-type
                          :query {:match_all {}})
-             (esd/scroll-seq)
+             (esd/scroll-seq es-client)
              (map :_source)
              (map trans-f)
              (pmap (fn [doc]
-                     (esd/create new-index mapping-type doc :id (:_id doc)))))))))
+                     (esd/create es-client new-index mapping-type doc :id (:_id doc)))))))))
 
 ;; ============================================================================
 ;; Functions for use within migrations
@@ -152,8 +153,8 @@
   (let [es-client (ensure-connected)
         current-index (first (find-index-names alias-name))
         mappings (:mappings ((esi/get-mapping es-client current-index) (keyword current-index)))
-        settings (-> ((get-settings es-client) (name current-index))
-                     (update-in ["index"] dissoc "uuid" "version"))
+        settings (-> (into {} ((get-settings es-client) (name current-index)))
+                     (update-in ["index"] #(dissoc (into {} %) "uuid" "version")))
         update-map (apply hash-map updates)
         mappings-u (or (:mappings update-map) {})
         settings-u (or (:settings update-map) {})]
