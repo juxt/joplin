@@ -87,14 +87,15 @@
   ([old-index mapping-type new-index trans-f]
      (let [es-client (ensure-connected)]
        (dorun
-        (->> (esd/search old-index
+        (->> (esd/search es-client
+                         old-index
                          mapping-type
                          :query {:match_all {}})
-             (esd/scroll-seq)
+             (esd/scroll-seq es-client)
              (map :_source)
              (map trans-f)
              (pmap (fn [doc]
-                     (esd/create new-index mapping-type doc :id (:_id doc)))))))))
+                     (esd/create es-client new-index mapping-type doc :id (:_id doc)))))))))
 
 ;; ============================================================================
 ;; Functions for use within migrations
@@ -131,13 +132,15 @@
 
 (defn create-index
   "Create an index with the specified options.  Only the alias name is specified, the
-   actual index name is auto-generated to avoid conflicts."
+   actual index name is auto-generated to avoid conflicts. Old and new index names returned
+   so user can perform data migration."
   [alias-name & opts]
   (let [new-index-name (str alias-name "-" (System/currentTimeMillis))
         old-index-name (first (find-index-names alias-name))]
     (apply esi/create (ensure-connected) new-index-name opts)
     (assign-alias alias-name new-index-name old-index-name)
-    (wait-for-ready 1)))
+    (wait-for-ready 1)
+    [old-index-name new-index-name]))
 
 (defn- deep-merge [& maps]
   (if (every? map? maps)
@@ -150,8 +153,8 @@
   (let [es-client (ensure-connected)
         current-index (first (find-index-names alias-name))
         mappings (:mappings ((esi/get-mapping es-client current-index) (keyword current-index)))
-        settings (-> ((get-settings es-client) (name current-index))
-                     (update-in ["index"] dissoc "uuid" "version"))
+        settings (-> (into {} ((get-settings es-client) (name current-index)))
+                     (update-in ["index"] #(dissoc (into {} %) "uuid" "version")))
         update-map (apply hash-map updates)
         mappings-u (or (:mappings update-map) {})
         settings-u (or (:settings update-map) {})]
