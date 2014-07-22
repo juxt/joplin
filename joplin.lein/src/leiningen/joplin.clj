@@ -2,7 +2,7 @@
   (:require [leinjacker.deps :as deps])
   (:use [leiningen.run :only (run)]))
 
-(def version "0.1.6")
+(def version "0.1.7-SNAPSHOT")
 
 (def libs
   {:dt   "joplin.datomic"
@@ -28,7 +28,7 @@
 (defn- add-joplin-deps [project]
   (let [types (get-db-types project)]
     (-> project
-        (deps/add-if-missing '[joplin.core "0.1.6"])
+        (deps/add-if-missing '[joplin.core "0.1.7-SNAPSHOT"])
         (add-dep :dt types)
         (add-dep :cass types)
         (add-dep :jdbc types)
