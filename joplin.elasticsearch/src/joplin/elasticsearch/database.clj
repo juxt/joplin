@@ -131,13 +131,15 @@
 
 (defn create-index
   "Create an index with the specified options.  Only the alias name is specified, the
-   actual index name is auto-generated to avoid conflicts."
+   actual index name is auto-generated to avoid conflicts. Old and new index names returned
+   so user can perform data migration."
   [alias-name & opts]
   (let [new-index-name (str alias-name "-" (System/currentTimeMillis))
         old-index-name (first (find-index-names alias-name))]
     (apply esi/create (ensure-connected) new-index-name opts)
     (assign-alias alias-name new-index-name old-index-name)
-    (wait-for-ready 1)))
+    (wait-for-ready 1)
+    [old-index-name new-index-name]))
 
 (defn- deep-merge [& maps]
   (if (every? map? maps)
