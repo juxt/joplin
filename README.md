@@ -190,6 +190,10 @@ For example;
 
 Valid database types are `:jdbc, :es, :zk, :dt, :cass`. Note that it's easy to [extend joplin](https://github.com/juxt/joplin/wiki/Adding-a-new-database-type) to handle more database types and thus introduce more valid database types.
 
+### Hacking joplin
+
+Joplin uses the [lein-sub](https://github.com/kumarshantanu/lein-sub) plugin, this makes it easy to install all projects locally with `lein sub install`.
+
 ## Documentation
 
 [Wiki](https://github.com/juxt/joplin/wiki)
