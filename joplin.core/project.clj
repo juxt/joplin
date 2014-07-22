@@ -1,4 +1,4 @@
-(defproject joplin.core "0.1.6-SNAPSHOT"
+(defproject joplin.core "0.1.6"
   :description "Flexible datastore migration and seeding"
   :url "http://github.com/martintrojer/joplin"
   :scm {:name "git"
