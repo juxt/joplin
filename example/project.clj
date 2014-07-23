@@ -22,8 +22,8 @@
 
                        :cass-dev {:type :cass, :hosts ["127.0.0.1"], :keyspace "test"}
 
-                       :es-dev   {:type :es, :host "localhost", :port 9300, :cluster "dev"}
-                       :es-prod  {:type :es, :host "es-prod", :port 9300, :cluster "dev"}
+                       :es-dev   {:type :es, :host "localhost", :port 9200}
+                       :es-prod  {:type :es, :host "es-prod", :port 9200}
 
                        :zk-dev   {:type :zk, :host "localhost", :port 2181, :client :curator}
                        :zk-prod  {:type :zk, :host "zk-prod", :port 2181, :client :exhibitor}
