@@ -52,6 +52,8 @@ To use `joplin.lein` you need to define a key called `:joplin` in your `project.
 
 The value of this key must be a map containing the keys `:databases`, `:migrators`, `:seeds` and `:environments`. The first three are pure declarations and `:environments` is where these declarations gets combined. For more details on these 4 keys see the [Concepts wiki page](https://github.com/juxt/joplin/wiki/concepts).
 
+Please note that the folders with migrators and seed-var namespaces needs to be in the classpath in order for joplin to access them.
+
 Example of a joplin definition;
 ```clojure
 :joplin {
