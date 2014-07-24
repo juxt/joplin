@@ -1,11 +1,13 @@
 (ns joplin.core
   (:require [clj-time.core :as t]
             [clj-time.format :as f]
+            [clojure.java.classpath :as classpath]
             [clojure.java.io :as io]
             [clojure.set]
-            [clojure.string]
+            [clojure.string :as string]
             [ragtime.core]
             [ragtime.main]))
+
 
 ;; ==========================================================================
 ;; methods implemented by migrator/seed targets
@@ -49,25 +51,36 @@ The first argument must be the name of the migration to create"
 (defn get-full-migrator-id [id]
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
-(defn- get-migration-ns [path]
+(defn- get-migration-files [path]
+  (let [folder (io/file path)
+        classpath-folder (->> (string/split path "/")
+                              rest (interpose "/") (apply str))]
+    (if (.isDirectory folder)
+      ;; If it's a folder just read the file from there
+      (map #(.getName %) (.listFiles folder))
+
+      ;; Try finding this path in a jar on the classpath
+      (->> (classpath/classpath-jarfiles)
+           (mapcat classpath/filenames-in-jar)
+           (filter #(.startsWith % classpath-folder))))))
+
+(defn- get-migration-namespaces [path]
   (when path
-    (let [ns (->> (clojure.string/split path #"/")
+    (let [ns (->> (string/split path #"/")
                   rest
                   (interpose ".")
-                  (apply str))
-          folder (io/file path)]
-      (->> (.listFiles folder)
-           (map #(.getName %))
+                  (apply str))]
+      (->> (get-migration-files path)
            (map #(re-matches #"(.*)(\.clj)$" %))
            (keep second)
-           (map #(clojure.string/replace % "_" "-"))
+           (map #(string/replace % "_" "-"))
            sort
            (mapv #(vector % (symbol (str ns "." %))))))))
 
 (defn get-migrations
   "Get all seq of ragtime migrators given a path (will scan the filesystem)"
   [path]
-  (for [[id ns] (get-migration-ns path)]
+  (for [[id ns] (get-migration-namespaces path)]
     (do
       (require ns)
       (verbose-migration
@@ -131,7 +144,7 @@ The first argument must be the name of the migration to create"
   (when (:migrator target)
     (let [migration-id (get-full-migrator-id id)
           path (str (:migrator target) "/"
-                    (clojure.string/replace migration-id "-" "_")
+                    (string/replace migration-id "-" "_")
                     ".clj")]
       (println "creating" path)
       (try
@@ -147,7 +160,7 @@ The first argument must be the name of the migration to create"
   )
 " (apply str (interpose "."
                         (concat
-                         (-> (:migrator target) (clojure.string/split #"/") rest)
+                         (-> (:migrator target) (string/split #"/") rest)
                          [migration-id]))) ns))
         (catch Exception e
           (println "Error creating file" path))))))
