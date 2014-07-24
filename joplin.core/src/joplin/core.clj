@@ -51,9 +51,9 @@ The first argument must be the name of the migration to create"
 (defn get-full-migrator-id [id]
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
-(defn- get-migration-files [path]
+(defn- get-files [path]
   (let [folder (io/file path)
-        classpath-folder (->> (string/split path "/")
+        classpath-folder (->> (string/split path #"/")
                               rest (interpose "/") (apply str))]
     (if (.isDirectory folder)
       ;; If it's a folder just read the file from there
@@ -70,7 +70,7 @@ The first argument must be the name of the migration to create"
                   rest
                   (interpose ".")
                   (apply str))]
-      (->> (get-migration-files path)
+      (->> (get-files path)
            (map #(re-matches #"(.*)(\.clj)$" %))
            (keep second)
            (map #(string/replace % "_" "-"))
