@@ -51,18 +51,20 @@ The first argument must be the name of the migration to create"
 (defn get-full-migrator-id [id]
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
-(defn- get-files [path]
+(defn get-files [path]
   (let [folder (io/file path)
         classpath-folder (->> (string/split path #"/")
                               rest (interpose "/") (apply str))]
     (if (.isDirectory folder)
       ;; If it's a folder just read the file from there
-      (map #(.getName %) (.listFiles folder))
+      (->> (.listFiles folder)
+           (map #(vector % (.getName %))))
 
       ;; Try finding this path in a jar on the classpath
       (->> (classpath/classpath-jarfiles)
            (mapcat classpath/filenames-in-jar)
-           (filter #(.startsWith % classpath-folder))))))
+           (filter #(.startsWith % classpath-folder))
+           (map #(vector (io/resource %) (.getName (io/file %))))))))
 
 (defn- get-migration-namespaces [path]
   (when path
@@ -71,6 +73,7 @@ The first argument must be the name of the migration to create"
                   (interpose ".")
                   (apply str))]
       (->> (get-files path)
+           (map second)
            (map #(re-matches #"(.*)(\.clj)$" %))
            (keep second)
            (map #(string/replace % "_" "-"))

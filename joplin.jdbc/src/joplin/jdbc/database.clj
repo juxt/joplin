@@ -1,10 +1,32 @@
 (ns joplin.jdbc.database
   (:use [joplin.core])
-  (:require [ragtime.core :as ragtime]
-            [ragtime.sql.files :as files]))
+  (:require [clojure.java.io :as io]
+            [ragtime.core :as ragtime]
+            [ragtime.sql.files]))
+
+(def run-sql-fn @#'ragtime.sql.files/run-sql-fn)
+(def migration-pattern @#'ragtime.sql.files/migration-pattern)
+
+(defn- migration? [[_ filename]]
+  (re-find migration-pattern filename))
+
+(defn- migration-id [[file filename]]
+  (second (re-find migration-pattern filename)))
+
+(defn- make-migration [[id [[down _] [up _]]]]
+    {:id   id
+     :up   (run-sql-fn up)
+     :down (run-sql-fn down)})
 
 (defn- get-sql-migrations [path]
-  (map verbose-migration (files/migrations path)))
+     (->> path
+          get-files
+          (filter migration?)
+          (sort-by second)
+          (group-by migration-id)
+          (map make-migration)
+          (sort-by :id)
+          (map verbose-migration)))
 
 (defn- get-db [target]
   (ragtime/connection (get-in target [:db :url])))
