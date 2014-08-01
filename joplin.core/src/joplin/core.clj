@@ -52,18 +52,31 @@ The first argument must be the name of the migration to create"
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
 (defn get-files [path]
-  (let [folder (io/file path)
-        classpath-folder (->> (string/split path #"/")
-                              rest (interpose "/") (apply str))]
-    (if (.isDirectory folder)
-      ;; If it's a folder just read the file from there
-      (->> (.listFiles folder)
-           (map #(vector % (.getName %))))
+  (let [local-folder (io/file path)
+        classpath-folder-name (->> (string/split path #"/")
+                                   rest (interpose "/") (apply str))
+        folder-on-classpath (->> (classpath/classpath-directories)
+                                 (map #(str (.getPath %) "/" classpath-folder-name))
+                                 (map io/file)
+                                 (filter #(.isDirectory %))
+                                 first)]
 
-      ;; Try finding this path in a jar on the classpath
-      (->> (classpath/classpath-jarfiles)
+    (cond
+     ;; If it's a local folder just read the file from there
+     (.isDirectory local-folder)
+     (->> (.listFiles local-folder)
+          (map #(vector % (.getName %))))
+
+     ;; If it's a folder on the classpath use that
+     folder-on-classpath
+     (->> (.listFiles folder-on-classpath)
+          (map #(vector % (.getName %))))
+
+     ;; Try finding this path inside a jar on the classpath
+     :else
+     (->> (classpath/classpath-jarfiles)
            (mapcat classpath/filenames-in-jar)
-           (filter #(.startsWith % classpath-folder))
+           (filter #(.startsWith % classpath-folder-name))
            (map #(vector (io/resource %) (.getName (io/file %))))))))
 
 (defn- get-migration-namespaces [path]
