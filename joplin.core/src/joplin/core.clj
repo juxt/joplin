@@ -48,10 +48,16 @@ The first argument must be the name of the migration to create"
       (println (format "Function '%s' not found" v))
       (println (.getMessage e)))))
 
-(defn get-full-migrator-id [id]
+(defn get-full-migrator-id
+  "Get a string with current date and time prepended"
+  [id]
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
-(defn get-files [path]
+(defn get-files
+  "Get migrations files given a folder path.
+Will try to locate files on the local filesystem, folder on the classpath
+or resource folders inside a jar on the classpath"
+  [path]
   (let [local-folder (io/file path)
         classpath-folder-name (->> (string/split path #"/")
                                    rest (interpose "/") (apply str))
@@ -75,11 +81,13 @@ The first argument must be the name of the migration to create"
      ;; Try finding this path inside a jar on the classpath
      :else
      (->> (classpath/classpath-jarfiles)
-           (mapcat classpath/filenames-in-jar)
-           (filter #(.startsWith % classpath-folder-name))
-           (map #(vector (io/resource %) (.getName (io/file %))))))))
+          (mapcat classpath/filenames-in-jar)
+          (filter #(.startsWith % classpath-folder-name))
+          (map #(vector (io/resource %) (.getName (io/file %))))))))
 
-(defn- get-migration-namespaces [path]
+(defn- get-migration-namespaces
+  "Get a sequence on namespaces containing the migrations on a given folder path"
+  [path]
   (when path
     (let [ns (->> (string/split path #"/")
                   rest
@@ -94,7 +102,8 @@ The first argument must be the name of the migration to create"
            (mapv #(vector % (symbol (str ns "." %))))))))
 
 (defn get-migrations
-  "Get all seq of ragtime migrators given a path (will scan the filesystem)"
+  "Get all seq of ragtime migrators given a path
+(will scan the filesystem and classpath)"
   [path]
   (for [[id ns] (get-migration-namespaces path)]
     (do
