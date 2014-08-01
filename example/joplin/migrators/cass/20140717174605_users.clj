@@ -1,7 +1,6 @@
 (ns migrators.cass.20140717174605-users
   (:use [joplin.cassandra.database])
-  (:require [clojurewerkz.cassaforte.client :as cc]
-            [clojurewerkz.cassaforte.cql    :as cql]
+  (:require [clojurewerkz.cassaforte.cql    :as cql]
             [clojurewerkz.cassaforte.query  :as cq]))
 
 (defn up [db]
