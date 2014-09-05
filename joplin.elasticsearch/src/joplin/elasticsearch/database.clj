@@ -61,10 +61,9 @@
                        mapping-type
                        :query {:match_all {}})
            (esd/scroll-seq es-client)
-           (map :_source)
-           (map trans-f)
            (pmap (fn [doc]
-                   (esd/create es-client new-index mapping-type doc :id (:_id doc))))))))
+                   (esd/create es-client new-index mapping-type
+                               (trans-f (:_source doc)) :id (:_id doc))))))))
 
 ;; ============================================================================
 ;; Functions for use within migrations
