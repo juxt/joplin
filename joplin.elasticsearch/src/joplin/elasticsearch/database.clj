@@ -59,7 +59,8 @@
       (->> (esd/search es-client
                        old-index
                        mapping-type
-                       :query {:match_all {}})
+                       :query {:match_all {}}
+                       :scroll "1m")
            (esd/scroll-seq es-client)
            (pmap (fn [doc]
                    (esd/create es-client new-index mapping-type
