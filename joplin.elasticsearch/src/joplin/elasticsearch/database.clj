@@ -107,12 +107,17 @@
     (apply merge-with deep-merge maps)
     (last maps)))
 
+(defn- get-index-settings [es-client index]
+  (-> (esi/get-settings es-client (name index))
+      (get (keyword index))
+      :settings))
+
 (defn update-index
   "Create an index based on a previous index, with updates applied."
   [es-client alias-name & updates]
   (let [current-index (first (find-index-names es-client alias-name))
         mappings (:mappings (get (esi/get-mapping es-client current-index) (keyword current-index)))
-        settings (-> (esi/get-settings es-client (name current-index))
+        settings (-> (get-index-settings es-client current-index)
                      (update-in [:index] dissoc :uuid :version))
         update-map (apply hash-map updates)
         mappings-u (or (:mappings update-map) {})
@@ -121,6 +126,18 @@
                   alias-name
                   :mappings (deep-merge mappings mappings-u)
                   :settings (deep-merge settings settings-u))))
+
+(defn clone-index
+  "Create an index with the same settings and mappings as another index"
+  [es-client source-index-alias target-index-alias]
+  (let [source-index (first (find-index-names es-client source-index-alias))
+        mappings (:mappings (get (esi/get-mapping es-client source-index) (keyword source-index)))
+        settings (-> (get-index-settings es-client source-index)
+                     (update-in [:index] dissoc :uuid :version))]
+    (create-index es-client
+                  target-index-alias
+                  :mappings mappings
+                  :settings settings)))
 
 (defn- rollback-index-to [es-client alias-name current previous]
   (assign-alias es-client alias-name previous current)
