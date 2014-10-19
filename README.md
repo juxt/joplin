@@ -103,23 +103,11 @@ Create a new migration scaffold file for a single database in an environment. Th
 
 ### Writing migrators
 
-Migrators come in 2 flavors; ragtime-style migrators for :jdbc databases and drift-style migrators for everything else.
+Joplin migrators defaults to be 'code driven'. They are basic Clojure files and allows the migrators to be as simple or complicated as needed. If you are working with SQL database, there a second flavor of migrators at your disposal; ragtime-style sql migrators.
 
-#### SQL migrators
+#### Joplin default migrators
 
-A SQL migrator consists of 2 files, one for the up and another for the down migration. Both must have the same name except for to the up/down part. These files can contain any number of SQL statements but nothing else.
-
-Example of SQL migrators;
-
-```
-$ ls -1 migrators/sql
-20120903221323-add-test-table.down.sql
-20120903221323-add-test-table.up.sql
-$ cat migrators/sql/20120903221323-add-test-table.up.sql
-CREATE TABLE test_table (id INT);
-```
-
-Non-SQL migrators consist of a single clojure source file. This file must contain (at least) 2 function definitions, one called `up` and one called `down`. The migrators will be called with one argument, which is the Ragtime Migratable record created by the joplin plugin. These record will contain the information you need to make a connections to the database and inflict a change.
+A migrator consist of a single clojure source file. This file must contain (at least) 2 function definitions, one called `up` and one called `down`. The migrators will be called with one argument, which is the Ragtime Migratable record created by the joplin plugin. These record will contain the information you need to make a connections to the database and inflict a change.
 
 Example of non-SQL migrator;
 
@@ -145,6 +133,20 @@ $ cat migrators/cass/20140717174605_users.clj
 ```
 
 Read the `project.clj` file for the corresponding joplin plugin to see what clojure database libraries can be used in the migrators.
+
+#### SQL migrators
+
+A SQL migrator consists of 2 files, one for the up and another for the down migration. Both must have the same name except for to the up/down part. These files can contain any number of SQL statements but nothing else.
+
+Example of SQL migrators;
+
+```
+$ ls -1 migrators/sql
+20120903221323-add-test-table.down.sql
+20120903221323-add-test-table.up.sql
+$ cat migrators/sql/20120903221323-add-test-table.up.sql
+CREATE TABLE test_table (id INT);
+```
 
 ### Writing seed functions
 
