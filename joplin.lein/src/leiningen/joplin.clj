@@ -8,6 +8,7 @@
   {:dt   "joplin.datomic"
    :cass "joplin.cassandra"
    :jdbc "joplin.jdbc"
+   :sql  "joplin.jdbc"
    :es   "joplin.elasticsearch"
    :zk   "joplin.zookeeper"})
 
@@ -32,6 +33,7 @@
         (add-dep :dt types)
         (add-dep :cass types)
         (add-dep :jdbc types)
+        (add-dep :sql types)
         (add-dep :es types)
         (add-dep :zk types))))
 

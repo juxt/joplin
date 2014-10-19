@@ -8,6 +8,7 @@
   :joplin {
            :migrators {:sql-mig "joplin/migrators/sql"
                        :imported-sql-mig "resources/imported-migrators/sql"
+                       :jdbc-mig "joplin/migrators/jdbc"
                        :es-mig "joplin/migrators/es"
                        :cass-mig "joplin/migrators/cass"
                        :dt-mig "joplin/migrators/datomic"}
@@ -17,8 +18,9 @@
                    :cass-seed "seeds.cass/run"
                    :dt-seed "seeds.dt/run"
                    :zk-seed "seeds.zk/run"}
-           :databases {:sql-dev  {:type :jdbc, :url "jdbc:h2:mem:test"}
-                       :sql-prod {:type :jdbc, :url "jdbc:h2:file:prod"}
+           :databases {:sql-dev  {:type :sql, :url "jdbc:h2:mem:test"}
+                       :sql-prod {:type :sql, :url "jdbc:h2:file:prod"}
+                       :jdbc-dev {:type :jdbc, :url "jdbc:h2:file:dev"}
 
                        :dt-dev {:type :dt, :url "datomic:mem://test"}
 
@@ -32,6 +34,7 @@
                        }
 
            :environments {:dev [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}
+                                {:db :jdbc-dev, :migrator :jdbc-mig, :seed :sql-seed}
                                 {:db :es-dev, :migrator :es-mig, :seed :es-seed}
                                 {:db :cass-dev, :migrator :cass-mig, :seed :cass-seed}
                                 {:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
