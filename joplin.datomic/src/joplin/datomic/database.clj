@@ -86,7 +86,8 @@
     (do-seed-fn migrations (->DTDatabase target) target args)))
 
 (defmethod reset-db :dt [target & args]
-  (do-reset (->DTDatabase target) target args))
+  (do-reset (get-migrations (:migrator target))
+            (->DTDatabase target) target args))
 
 (defmethod create-migration :dt [target & [id]]
   (do-create-migration target id "joplin.datomic.database"))

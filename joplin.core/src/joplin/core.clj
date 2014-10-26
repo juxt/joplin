@@ -155,7 +155,11 @@ or resource folders inside a jar on the classpath"
 
 (defn do-reset
   "Perform a reset on a database"
-  [db target args]
+  [migrations db target args]
+
+  (println "Resetting" db)
+  (doseq [m migrations]
+    (ragtime.core/remember-migration m))
 
   ;; Roll back all
   (ragtime.core/rollback-last db Integer/MAX_VALUE)

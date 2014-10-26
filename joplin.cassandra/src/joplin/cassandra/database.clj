@@ -65,7 +65,8 @@
     (do-seed-fn migrations (->CassDatabase target) target args)))
 
 (defmethod reset-db :cass [target & args]
-  (do-reset (->CassDatabase target) target args))
+  (do-reset (get-migrations (:migrator target))
+            (->CassDatabase target) target args))
 
 (defmethod create-migration :cass [target & [id]]
   (do-create-migration target id "joplin.cassandra.database"))

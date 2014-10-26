@@ -191,7 +191,8 @@
     (do-seed-fn migrations (->ESDatabase target) target args)))
 
 (defmethod reset-db :es [target & args]
-  (do-reset (->ESDatabase target) target args))
+  (do-reset (get-migrations (:migrator target))
+            (->ESDatabase target) target args))
 
 (defmethod create-migration :es [target & [id]]
   (do-create-migration target id "joplin.elasticsearch.database"))

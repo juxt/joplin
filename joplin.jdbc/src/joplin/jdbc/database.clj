@@ -55,7 +55,8 @@
     (do-seed-fn migrations (get-db target) target args)))
 
 (defmethod reset-db :sql [target & args]
-  (do-reset (get-db target) target args))
+  (do-reset (get-sql-migrations (:migrator target))
+            (get-db target) target args))
 
 (defmethod create-migration :sql [target & [id]]
   (let [migration-id (get-full-migrator-id id)
@@ -86,7 +87,8 @@
                 target args)))
 
 (defmethod reset-db :jdbc [target & args]
-  (do-reset (map->SqlDatabase (append-uri target)) target args))
+  (do-reset (get-migrations (:migrator target))
+            (map->SqlDatabase (append-uri target)) target args))
 
 (defmethod create-migration :jdbc [target & [id]]
   (do-create-migration target id "joplin.jdbc.database"))
