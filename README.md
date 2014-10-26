@@ -25,13 +25,13 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 Add joplin.core as a dependency if you just want the database-independent core:
 
 ```clojure
-:dependencies [[joplin.core "0.2.0"]]
+:dependencies [[joplin.core "0.2.1"]]
 ```
 
 Or add the full library if you want support for ES/SQL/DT/CASS/ZK databases:
 
 ```clojure
-:dependencies [[joplin "0.2.0"]]
+:dependencies [[joplin "0.2.1"]]
 ```
 
 You can also cherry-pick the plugins you need to minimize the dependencies in your classpath. Just include `joplin.core` and the plugins you are interested in.
@@ -39,7 +39,7 @@ You can also cherry-pick the plugins you need to minimize the dependencies in yo
 If you want to integrate Joplin into Leiningen:
 
 ```clojure
-:plugins [[joplin.lein "0.2.0"]]
+:plugins [[joplin.lein "0.2.1"]]
 ```
 
 `joplin.lein` will only add dependencies for the plugins that you are using, i.e. the type of the databases you have defined.

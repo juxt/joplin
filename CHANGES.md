@@ -1,3 +1,9 @@
+## 0.2.1
+
+### Fixes
+
+* reset did not rollback before migrating
+
 ## 0.2.0
 
 ### Breaking changes
