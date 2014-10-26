@@ -20,15 +20,21 @@
      :up   (run-sql-fn up)
      :down (run-sql-fn down)})
 
+(defn- get-sql-migrations' [path]
+  (->> path
+       get-files
+       (filter migration?)
+       (sort-by second)
+       (group-by migration-id)
+       (map make-migration)
+       (sort-by :id)
+       (map verbose-migration)))
+
 (defn- get-sql-migrations [path]
-     (->> path
-          get-files
-          (filter migration?)
-          (sort-by second)
-          (group-by migration-id)
-          (map make-migration)
-          (sort-by :id)
-          (map verbose-migration)))
+  (let [migrations (get-sql-migrations' path)]
+    (when (empty? migrations)
+      (println "Warning, no migrators found!"))
+    migrations))
 
 (defn- get-db [target]
   (ragtime/connection (get-in target [:db :url])))

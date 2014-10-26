@@ -105,13 +105,16 @@ or resource folders inside a jar on the classpath"
   "Get all seq of ragtime migrators given a path
 (will scan the filesystem and classpath)"
   [path]
-  (for [[id ns] (get-migration-namespaces path)]
-    (do
-      (require ns)
-      (verbose-migration
-       {:id id
-        :up (load-var (str ns "/up"))
-        :down (load-var (str ns "/down"))}))))
+  (let [migration-namespaces (get-migration-namespaces path)]
+    (when (empty? migration-namespaces)
+      (println "Warning, no migrators found!"))
+    (for [[id ns] migration-namespaces]
+      (do
+        (require ns)
+        (verbose-migration
+         {:id id
+          :up (load-var (str ns "/up"))
+          :down (load-var (str ns "/down"))})))))
 
 (defn do-migrate
   "Perform migration on a database"
