@@ -96,7 +96,7 @@
 (defmethod seed-db :zk [target & args]
   (println "Seeding #joplin.zookeeper.database.ZK" (select-keys (:db target) [:host :port :client]))
   (when-let [seed-fn (and (:seed target) (load-var (:seed target)))]
-    (println "Appying seed function" (:seed target))
+    (println "Applying seed function" (:seed target))
     (apply seed-fn target args)))
 
 (defmethod reset-db :zk [target & args]
