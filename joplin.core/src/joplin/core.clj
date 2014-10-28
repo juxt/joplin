@@ -147,7 +147,7 @@ or resource folders inside a jar on the classpath"
 
        seed-fn
        (do
-         (println "Appying seed function" (:seed target))
+         (println "Applying seed function" (:seed target))
          (apply seed-fn target args))
 
        :else

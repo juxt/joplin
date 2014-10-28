@@ -1,3 +1,5 @@
+This project has moved to the juxt organization. See [Juxt/Joplin](https://github.com/juxt/joplin)
+
 # Joplin
 
 Joplin is a library for flexible datastore migration and seeding.
