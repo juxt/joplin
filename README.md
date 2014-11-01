@@ -1,5 +1,3 @@
-This project has moved to the juxt organization. See [Juxt/Joplin](https://github.com/juxt/joplin)
-
 # Joplin
 
 Joplin is a library for flexible datastore migration and seeding.
@@ -81,7 +79,7 @@ All commands take the name of the environment as their first argument.
 
 - `lein joplin migrate ENV [DB]`
 
-Run all pending (up) migrations on either all databases in the environment of a single if the DB param us provided. This operation is idempotent.
+Run all pending (up) migrations on either all databases in the environment or a single if the DB param is provided. This operation is idempotent.
 
 - `lein joplin seed ENV [DB]`
 
@@ -105,13 +103,13 @@ Create a new migration scaffold file for a single database in an environment. Th
 
 ### Writing migrators
 
-Joplin migrators defaults to be 'code driven'. They are basic Clojure files and allows the migrators to be as simple or complicated as needed. If you are working with SQL database, there a second flavor of migrators at your disposal; ragtime-style sql migrators.
+Joplin migrators defaults to be 'code driven'. They are basic Clojure files and allows the migrators to be as simple or complicated as needed. If you are working with a SQL database, there is a second flavour of migrators at your disposal; ragtime-style sql migrators.
 
 #### Joplin default migrators
 
 A migrator consist of a single clojure source file. This file must contain (at least) 2 function definitions, one called `up` and one called `down`. The migrators will be called with one argument, which is the Ragtime Migratable record created by the joplin plugin. These record will contain the information you need to make a connections to the database and inflict a change.
 
-Example of non-SQL migrator;
+Example of migrator;
 
 ```clojure
 $ ls -1 migrators/cass
@@ -138,9 +136,11 @@ Read the `project.clj` file for the corresponding joplin plugin to see what cloj
 
 #### SQL migrators
 
+When migrating SQL databases you have 2 flavours of migrators at your disposal. The Joplin default migrator as described above and 'SQL migrators' as described in this section. SQL migrators are defined with the Joplin database type `:sql`, where joplin default migrators for SQL databases are defined with the type `:jdbc`. See the example project for details.
+
 A SQL migrator consists of 2 files, one for the up and another for the down migration. Both must have the same name except for to the up/down part. These files can contain any number of SQL statements but nothing else.
 
-Example of SQL migrators;
+Example of a SQL migrator;
 
 ```
 $ ls -1 migrators/sql
