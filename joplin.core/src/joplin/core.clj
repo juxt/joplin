@@ -124,12 +124,11 @@ or resource folders inside a jar on the classpath"
 
 (defn do-rollback
   "Perform rollback on a database"
-  [migrations db n-str]
+  [migrations db n]
   (println "Rolling back" db)
   (doseq [m migrations]
     (ragtime.core/remember-migration m))
-  (ragtime.core/rollback-last db (or (when n-str (Integer/parseInt n-str))
-                                     1)))
+  (ragtime.core/rollback-last db (or n 1)))
 
 (defn do-seed-fn
   "Run a seeder function with migration check"

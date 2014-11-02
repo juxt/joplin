@@ -72,7 +72,9 @@ Options:
       "migrate"  (run-op migrate-db targets clean-args)
       "seed"     (run-op seed-db targets clean-args)
 
-      "rollback" (apply rollback-db (first targets) clean-args)
+      "rollback" (apply rollback-db (first targets)
+                        (when (not-empty clean-args)
+                          (cons (Integer/parseInt (first clean-args)) (rest clean-args))))
       "reset"    (apply reset-db (first targets) clean-args)
       "create"   (apply create-migration (first targets) clean-args)
 
