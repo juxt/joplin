@@ -28,7 +28,7 @@ Add joplin.core as a dependency if you just want the database-independent core:
 :dependencies [[joplin.core "0.2.1"]]
 ```
 
-Or add the full library if you want support for ES/SQL/DT/CASS/ZK databases:
+Or add the full library if you want support for ElasticSearch/SQL/Datomic/Cassandra/ZooKeeper databases:
 
 ```clojure
 :dependencies [[joplin "0.2.1"]]
@@ -62,14 +62,14 @@ Example of a joplin definition;
          :seeds {:sql-seed "seeds.sql/run"             ;; A clojure var (function) that applies the seed
                  :es-seed "seeds.es/run"}
 
-         :databases {:sql-dev {:type :jdbc, :url "jdbc:h2:mem:dev"
+         :databases {:sql-dev {:type :jdbc, :url "jdbc:h2:mem:dev"}
                      :es-prod {:type :es, :host "es-prod.local", :port "9300", :cluster "dev"}
-                     :sql-prod {:type :jdbc, :url "jdbc:h2:file:prod"}
+                     :sql-prod {:type :jdbc, :url "jdbc:h2:file:prod"}}
 
          ;; We combine the definitions above into different environments
          :environments {:dev [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}]
                         :prod [{:db :sql-prod, :migrator :sql-mig}
-                               {:db :es-prod}, :seed :es-seed]
+                               {:db :es-prod}, :seed :es-seed]}
         }
 ```
 
@@ -136,11 +136,7 @@ Read the `project.clj` file for the corresponding joplin plugin to see what cloj
 
 #### SQL migrators
 
-When migrating SQL databases you have 2 flavours of migrators at your disposal. The Joplin default migrator as described above and 'SQL migrators' as described in this section. SQL migrators are defined with the Joplin database type `:sql`, where joplin default migrators for SQL databases are defined with the type `:jdbc`. See the example project for details.
-
-A SQL migrator consists of 2 files, one for the up and another for the down migration. Both must have the same name except for to the up/down part. These files can contain any number of SQL statements but nothing else.
-
-Example of a SQL migrator;
+When migrating SQL databases you have 2 flavours of migrators at your disposal. You may specify your migrations with two text files (one up, one down) as shown below:
 
 ```
 $ ls -1 migrators/sql
@@ -149,6 +145,10 @@ $ ls -1 migrators/sql
 $ cat migrators/sql/20120903221323-add-test-table.up.sql
 CREATE TABLE test_table (id INT);
 ```
+
+For this type of migration, use the Joplin database type `:sql`.
+
+You may also specify your migrations as Clojure namespaces, like the example for Cassandra above, by using the Joplin database type `:jdbc`. See the example project for details.
 
 ### Writing seed functions
 
@@ -193,7 +193,7 @@ For example;
 }
 ```
 
-Valid database types are `:jdbc, :es, :zk, :dt, :cass`. Note that it's easy to [extend joplin](https://github.com/juxt/joplin/wiki/Adding-a-new-database-type) to handle more database types and thus introduce more valid database types.
+Valid database types are `:jdbc, :sql, :es, :zk, :dt, :cass`. Note that it's easy to [extend joplin](https://github.com/juxt/joplin/wiki/Adding-a-new-database-type) to handle more database types and thus introduce more valid database types.
 
 ### Hacking joplin
 
