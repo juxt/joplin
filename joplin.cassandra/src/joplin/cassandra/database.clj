@@ -37,7 +37,7 @@
     (ensure-migration-schema (get-connection hosts keyspace))
     (cql/delete (get-connection hosts keyspace)
                 "migrations"
-                (cq/where :id id)))
+                (cq/where {:id id})))
 
   (applied-migration-ids [db]
     (ensure-migration-schema (get-connection hosts keyspace))
