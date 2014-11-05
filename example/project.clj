@@ -1,7 +1,7 @@
-(defproject joplin-example "0.2.2"
+(defproject joplin-example "0.2.3-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.h2database/h2 "1.3.160"]]
-  :plugins [[joplin.lein "0.2.2"]]
+  :plugins [[joplin.lein "0.2.3-SNAPSHOT"]]
 
   :source-paths ["src" "joplin"]
 
