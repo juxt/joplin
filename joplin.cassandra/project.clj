@@ -6,5 +6,5 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [clojurewerkz/cassaforte "2.0.0-beta8"]
+                 [clojurewerkz/cassaforte "2.0.0-rc4"]
                  [joplin.core "0.2.3-SNAPSHOT"]])
