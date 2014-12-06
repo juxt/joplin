@@ -12,7 +12,7 @@
                  [joplin.zookeeper "0.2.3-SNAPSHOT"]
                  [joplin.datomic "0.2.3-SNAPSHOT"]
                  [joplin.cassandra "0.2.3-SNAPSHOT"]
-                 [clojurewerkz/ragtime "0.4.0"]]
+                 [ragtime/ragtime "0.3.8"]]
   :plugins [[lein-sub "0.3.0"]]
   :sub ["joplin.core" "joplin.jdbc" "joplin.elasticsearch" "joplin.zookeeper"
         "joplin.datomic" "joplin.cassandra" "joplin.lein"])
