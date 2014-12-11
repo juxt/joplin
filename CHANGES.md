@@ -1,5 +1,11 @@
 ## 0.2.3
 
+### Breaking changes
+
+joplin.elasitcsearch
+
+update-index now updates the index mappings and settings in place. There are many caveats to what you can change in place in ES. For things that you can't change, clone-index has been changed to behave like the old update-index did - that is, it creates a new index, copies over all settings and mappings (with optional deltas that you can supply) and points the alias at the newly created index.
+
 ### New features
 
 * New plugin joplin.hive using Avro
