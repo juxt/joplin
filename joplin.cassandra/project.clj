@@ -1,4 +1,4 @@
-(defproject joplin.cassandra "0.2.3"
+(defproject joplin.cassandra "0.2.4-SNAPSHOT"
   :description "Cassandra support for Joplin"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
@@ -7,4 +7,4 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [clojurewerkz/cassaforte "2.0.0-rc4"]
-                 [joplin.core "0.2.3"]])
+                 [joplin.core "0.2.4-SNAPSHOT"]])
