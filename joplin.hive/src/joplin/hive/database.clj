@@ -84,4 +84,3 @@
 
 (defmethod joplin/create-migration :hive [target & [id]]
   (joplin/do-create-migration target id "joplin.hive.database"))
-

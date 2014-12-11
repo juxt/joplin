@@ -5,11 +5,14 @@
 
   :source-paths ["src" "joplin"]
 
+  ;; Please note that elastisch and hive doesn't play well together (class path clashes)
+
   :joplin {
            :migrators {:sql-mig "joplin/migrators/sql"
                        :imported-sql-mig "resources/imported-migrators/sql"
                        :jdbc-mig "joplin/migrators/jdbc"
                        :es-mig "joplin/migrators/es"
+                       :hive-mig "joplin/migrators/hive"
                        :cass-mig "joplin/migrators/cass"
                        :dt-mig "joplin/migrators/datomic"}
            :seeds {:sql-seed "seeds.sql/run"
@@ -21,6 +24,7 @@
            :databases {:sql-dev  {:type :sql, :url "jdbc:h2:mem:test"}
                        :sql-prod {:type :sql, :url "jdbc:h2:file:prod"}
                        :jdbc-dev {:type :jdbc, :url "jdbc:h2:file:dev"}
+                       :hive-dev {:type :hive, :subname "//localhost:10000/default"}
 
                        :dt-dev {:type :dt, :url "datomic:mem://test"}
 
@@ -37,6 +41,7 @@
                                 {:db :jdbc-dev, :migrator :jdbc-mig, :seed :sql-seed}
                                 {:db :es-dev, :migrator :es-mig, :seed :es-seed}
                                 {:db :cass-dev, :migrator :cass-mig, :seed :cass-seed}
+                                {:db :hive-dev, :migrator :hive-mig}
                                 {:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
                                 {:db :zk-dev, :seed :zk-seed}]
                           :prod [{:db :sql-prod, :migrator :imported-sql-mig, :seed :imported-sql-seed}
