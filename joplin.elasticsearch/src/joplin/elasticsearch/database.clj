@@ -122,31 +122,60 @@
       :settings))
 
 (defn update-index
-  "Create an index based on a previous index, with updates applied."
+  "Update the mappings and settings of an existing index in place.
+
+   You can change settings in a fairly straightforward manner.
+
+   Mappings can also be changed, e.g. to add mappings for new fields.
+   Care must be taken when updating mappings of existing fields - see the ES documentation - but you
+   may well get unexpected behaviour. You can set :ignore-conflicts? to true if you know it is
+   safe to do so.
+
+   If you are making non-compatible changes to settings or mappings you should not use this function -
+   you will need to use clone-index with your mapping updates
+   and then migrate-data to copy the data into it."
   [es-client alias-name & updates]
   (let [current-index (first (find-index-names es-client alias-name))
         mappings (:mappings (get (esi/get-mapping es-client current-index) (keyword current-index)))
         settings (-> (get-index-settings es-client current-index)
                      (update-in [:index] dissoc :uuid :version))
         update-map (apply hash-map updates)
-        mappings-u (or (:mappings update-map) {})
-        settings-u (or (:settings update-map) {})]
-    (create-index es-client
-                  alias-name
-                  :mappings (deep-merge mappings mappings-u)
-                  :settings (deep-merge settings settings-u))))
+        mappings-updates (or (:mappings update-map) {})
+        settings-updates (or (:settings update-map) {})
+        ignore-conflicts? (or (:ignore-conflicts? update-map) false)]
+
+    (doseq [[type _] mappings-updates]
+      (let [new-mappings (select-keys (deep-merge mappings mappings-updates) [type])
+            result (esi/update-mapping es-client alias-name (name type) {:mapping new-mappings
+                                                                         :ignore_conflicts ignore-conflicts?})]
+        (when (:error result)
+          (println result))))
+
+    (when (not-empty settings-updates)
+      (let [result (esi/update-settings es-client alias-name settings-updates)]
+        (when (:error result)
+          (println result))))))
 
 (defn clone-index
-  "Create an index with the same settings and mappings as another index"
-  [es-client source-index-alias target-index-alias]
+  "Create a new index with settings and mappings copied from source index,
+   with optional updates to mappings or settings.
+
+   Use when you need to change a setting that affects the way existing data has been indexed.
+
+   To move the data as well, use migrate-data."
+  [es-client source-index-alias target-index-alias & updates]
   (let [source-index (first (find-index-names es-client source-index-alias))
         mappings (:mappings (get (esi/get-mapping es-client source-index) (keyword source-index)))
         settings (-> (get-index-settings es-client source-index)
-                     (update-in [:index] dissoc :uuid :version))]
+                     (update-in [:index] dissoc :uuid :version))
+        update-map (apply hash-map updates)
+        mappings-updates (or (:mappings update-map) {})
+        settings-updates (or (:settings update-map) {})]
+
     (create-index es-client
                   target-index-alias
-                  :mappings mappings
-                  :settings settings)))
+                  :mappings (deep-merge mappings mappings-updates)
+                  :settings (deep-merge settings settings-updates))))
 
 (defn- rollback-index-to [es-client alias-name current previous]
   (assign-alias es-client alias-name previous current)
