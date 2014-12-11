@@ -6,7 +6,7 @@ Joplin tries to solve the problems that arise when dealing with complicated syst
 
 Joplin lets you declare your `databases`, `migrators`, `seed functions` up front and combine them into different `environments`. It can be used via a [leiningen](http://leiningen.org) plugin or be called programatically.
 
-Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch, Cassandra and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
+Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch, Cassandra, Hive and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
 
 Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 
@@ -16,6 +16,7 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 * joplin.cassandra - migrate and seed [Cassandra](http://cassandra.apache.org) clusters
 * joplin.datomic - migrate and seed [Datomic](http://datomic.com) databases
 * joplin.elasticsearch - migrate and seed [Elasticsearch](http://elasticsearch.org) clusters
+* joplin.hive - migrate and seed [Hive](https://hive.apache.org) tables using Avro
 * joplin.jdbc - migrate and seed SQL databases with jdbc
 * joplin.lein - a leiningen plugin run migrations and seeds
 * joplin.zookeeper - seed [Zookeeper](http://zookeeper.apache.org) clusters
@@ -28,7 +29,7 @@ Add joplin.core as a dependency if you just want the database-independent core:
 :dependencies [[joplin.core "0.2.2"]]
 ```
 
-Or add the full library if you want support for ElasticSearch/SQL/Datomic/Cassandra/ZooKeeper databases:
+Or add the full library if you want support for ElasticSearch/SQL/Datomic/Cassandra/ZooKeeper/Hive databases:
 
 ```clojure
 :dependencies [[joplin "0.2.2"]]
