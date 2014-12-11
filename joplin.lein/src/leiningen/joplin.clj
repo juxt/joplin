@@ -9,6 +9,7 @@
    :cass "joplin.cassandra"
    :jdbc "joplin.jdbc"
    :sql  "joplin.jdbc"
+   :hive "joplin.hive"
    :es   "joplin.elasticsearch"
    :zk   "joplin.zookeeper"})
 
@@ -34,6 +35,7 @@
         (add-dep :cass types)
         (add-dep :jdbc types)
         (add-dep :sql types)
+        (add-dev :hive types)
         (add-dep :es types)
         (add-dep :zk types))))
 

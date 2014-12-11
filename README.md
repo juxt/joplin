@@ -29,21 +29,24 @@ Add joplin.core as a dependency if you just want the database-independent core:
 :dependencies [[joplin.core "0.2.2"]]
 ```
 
-Or add the full library if you want support for ElasticSearch/SQL/Datomic/Cassandra/ZooKeeper/Hive databases:
-
-```clojure
-:dependencies [[joplin "0.2.2"]]
-```
-
-You can also cherry-pick the plugins you need to minimize the dependencies in your classpath. Just include `joplin.core` and the plugins you are interested in.
-
 If you want to integrate Joplin into Leiningen:
 
 ```clojure
 :plugins [[joplin.lein "0.2.2"]]
 ```
 
-`joplin.lein` will only add dependencies for the plugins that you are using, i.e. the type of the databases you have defined.
+`joplin.lein` will add dependencies to your project only for the plugins that you are using, i.e. the type of the databases you have defined.
+
+If you are not using Leiningen, add a depedency (only) for the plugins of the databases you want to migrate;
+
+```clojure
+:dependencies [[joplin.cassandra "0.2.2"]
+               [joplin.datomic "0.2.2"]
+               [joplin.elasticserch "0.2.2"]
+               [joplin.hive "0.2.2"]
+               [joplin.jdbc "0.2.2"]
+               [joplin.zookeeper "0.2.2"]]
+```
 
 ## Usage
 

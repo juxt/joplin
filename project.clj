@@ -6,13 +6,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [joplin.core "0.2.3-SNAPSHOT"]
-                 [joplin.jdbc "0.2.3-SNAPSHOT"]
-                 [joplin.elasticsearch "0.2.3-SNAPSHOT"]
-                 [joplin.zookeeper "0.2.3-SNAPSHOT"]
-                 [joplin.datomic "0.2.3-SNAPSHOT"]
-                 [joplin.cassandra "0.2.3-SNAPSHOT"]
-                 [ragtime/ragtime "0.3.8"]]
+                 [joplin.core "0.2.3-SNAPSHOT"]]
   :plugins [[lein-sub "0.3.0"]]
   :sub ["joplin.core" "joplin.jdbc" "joplin.elasticsearch" "joplin.zookeeper"
-        "joplin.datomic" "joplin.cassandra" "joplin.lein"])
+        "joplin.datomic" "joplin.cassandra" "joplin.hive" "joplin.lein"])
