@@ -5,6 +5,7 @@
             [clj-time.core :as t]
             [clojurewerkz.elastisch.rest :as es]
             [clojurewerkz.elastisch.rest.admin :as admin]
+            [clojurewerkz.elastisch.rest.bulk :as bulk]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.rest.index :as esi]
             [clojure.walk :refer [stringify-keys]]
@@ -62,9 +63,17 @@
                        :query {:match_all {}}
                        :scroll "1m")
            (esd/scroll-seq es-client)
-           (pmap (fn [doc]
-                   (esd/create es-client new-index mapping-type
-                               (trans-f (:_source doc)) :id (:_id doc))))))))
+           (partition-all 50)
+           (pmap (fn [docs]
+                   (let [updated-docs (map (fn [doc]
+                                             (merge (trans-f (:_source doc))
+                                                    (select-keys doc [:_id])))
+                                           docs)]
+                     (bulk/bulk-with-index-and-type
+                      es-client
+                      new-index
+                      mapping-type
+                      (bulk/bulk-index updated-docs)))))))))
 
 ;; ============================================================================
 ;; Functions for use within migrations
