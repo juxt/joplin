@@ -35,7 +35,7 @@
         (add-dep :cass types)
         (add-dep :jdbc types)
         (add-dep :sql types)
-        (add-dev :hive types)
+        (add-dep :hive types)
         (add-dep :es types)
         (add-dep :zk types))))
 
