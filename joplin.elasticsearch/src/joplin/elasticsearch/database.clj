@@ -52,6 +52,11 @@
 ;; ============================================================================
 ;; Data migration
 
+;; Copied from clojurewerkz.elastisch.rest.bulk - allows migrators to optionally migrate these fields too
+;; excludes :_index
+(def ^:private special-operation-keys
+  [:_type :_id :_retry_on_conflict :_routing :_percolate :_parent :_timestamp :_ttl])
+
 (defn migrate-data
   ([es-client old-index mapping-type new-index]
      (migrate-data es-client old-index mapping-type new-index identity))
@@ -66,13 +71,12 @@
            (partition-all 50)
            (pmap (fn [docs]
                    (let [updated-docs (map (fn [doc]
-                                             (merge (trans-f (:_source doc))
-                                                    (select-keys doc [:_id])))
+                                             (merge (select-keys doc special-operation-keys)
+                                                    (trans-f (:_source doc))))
                                            docs)]
-                     (bulk/bulk-with-index-and-type
+                     (bulk/bulk-with-index
                       es-client
                       new-index
-                      mapping-type
                       (bulk/bulk-index updated-docs)))))))))
 
 ;; ============================================================================
