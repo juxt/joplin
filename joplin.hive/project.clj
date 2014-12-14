@@ -1,4 +1,4 @@
-(defproject joplin.hive "0.2.4-SNAPSHOT"
+(defproject joplin.hive "0.2.4"
   :description "Hive Avro support for Joplin"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
@@ -11,4 +11,4 @@
                  [org.apache.hive/hive-exec "0.13.0"]
                  [org.apache.hive/hive-jdbc "0.13.0"]
                  [commons-io/commons-io "2.4"]
-                 [joplin.core "0.2.4-SNAPSHOT"]])
+                 [joplin.core "0.2.4"]])
