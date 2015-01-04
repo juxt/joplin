@@ -8,4 +8,4 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [clojurewerkz/elastisch "2.1.0"]
                  [joplin.core "0.2.5-SNAPSHOT"]
-                 [clj-time "0.8.0"]])
+                 [clj-time "0.9.0"]])
