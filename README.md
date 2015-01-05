@@ -42,7 +42,7 @@ If you are not using Leiningen, add a depedency (only) for the plugins of the da
 ```clojure
 :dependencies [[joplin.cassandra "0.2.4"]
                [joplin.datomic "0.2.4"]
-               [joplin.elasticserch "0.2.4"]
+               [joplin.elasticsearch "0.2.4"]
                [joplin.hive "0.2.4"]
                [joplin.jdbc "0.2.4"]
                [joplin.zookeeper "0.2.4"]]
