@@ -215,7 +215,7 @@
     (es-get-applied-migrations (client db))))
 
 (defn ->ESDatabase [target]
-  (map->ElasticSearchDatabase (select-keys (:db target) [:host :port])))
+  (map->ElasticSearchDatabase (select-keys (:db target) [:host :port :index])))
 
 ;; ============================================================================
 ;; Joplin interface
