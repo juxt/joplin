@@ -205,7 +205,7 @@
 ;; ============================================================================
 ;; Ragtime interface
 
-(defrecord ElasticSearchDatabase [host port]
+(defrecord ElasticSearchDatabase [host port index]
   Migratable
   (add-migration-id [db id]
     (es-add-migration-id (client db) id))
