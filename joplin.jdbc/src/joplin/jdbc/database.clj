@@ -30,9 +30,10 @@
        (sort-by :id)
        (map verbose-migration)))
 
-(defn- get-sql-migrations [path]
-  (let [migrations (get-sql-migrations' path)]
-    (when (empty? migrations)
+(defn- get-sql-migrations [paths]
+  (let [paths (if (sequential? paths) paths [paths])
+        migrations (flatten (map get-sql-migrations' paths))]
+    (when (some empty? migrations)
       (println "Warning, no migrators found!"))
     migrations))
 
