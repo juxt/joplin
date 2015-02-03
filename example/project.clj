@@ -31,6 +31,7 @@
                        :cass-dev {:type :cass, :hosts ["127.0.0.1"], :keyspace "test"}
 
                        :es-dev   {:type :es, :host "localhost", :port 9200}
+                       :es-data  {:type :es, :host "localhost", :port 9200 :migration-index "migrations-data"}
                        :es-prod  {:type :es, :host "es-prod", :port 9200}
 
                        :zk-dev   {:type :zk, :host "localhost", :port 2181, :client :curator}

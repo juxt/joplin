@@ -16,23 +16,26 @@
 ;; ============================================================================
 ;; Handle migration tracking
 
-(def migration-index "migrations")
+(def default-migration-index "migrations")
 (def migration-type "migration")
 (def migration-document-id "0")
 
-(defn- ensure-migration-index [es-client]
+(defn- get-migration-index [db]
+  (or (:migration-index db) default-migration-index))
+
+(defn- ensure-migration-index [es-client migration-index]
   (when-not (esi/exists? es-client migration-index)
     (esi/create es-client migration-index)))
 
-(defn- es-get-applied [es-client]
-  (ensure-migration-index es-client)
+(defn- es-get-applied [es-client migration-index]
+  (ensure-migration-index es-client migration-index)
   (->> (esd/get es-client migration-index migration-type migration-document-id)
        :_source
        :migrations
        (stringify-keys)))
 
-(defn es-get-applied-migrations [es-client]
-  (->> (es-get-applied es-client)
+(defn es-get-applied-migrations [es-client migration-index]
+  (->> (es-get-applied es-client migration-index)
        (sort-by second)
        keys
        (map name)))
@@ -40,14 +43,14 @@
 (defn- timestamp-as-string []
   (f/unparse (f/formatters :date-time) (t/now)))
 
-(defn es-add-migration-id [es-client migration-id]
+(defn es-add-migration-id [es-client migration-index migration-id]
   (esd/put es-client migration-index migration-type migration-document-id
-           {:migrations (assoc (es-get-applied es-client) migration-id
+           {:migrations (assoc (es-get-applied es-client migration-index) migration-id
                                (timestamp-as-string))}))
 
-(defn es-remove-migration-id [es-client migration-id]
+(defn es-remove-migration-id [es-client migration-index migration-id]
   (esd/put es-client migration-index migration-type migration-document-id
-           {:migrations (dissoc (es-get-applied es-client) migration-id)}))
+           {:migrations (dissoc (es-get-applied es-client migration-index) migration-id)}))
 
 ;; ============================================================================
 ;; Data migration
@@ -205,17 +208,18 @@
 ;; ============================================================================
 ;; Ragtime interface
 
-(defrecord ElasticSearchDatabase [host port index]
+(defrecord ElasticSearchDatabase [host port index migration-index]
   Migratable
   (add-migration-id [db id]
-    (es-add-migration-id (client db) id))
+    (es-add-migration-id (client db) (get-migration-index db) id))
   (remove-migration-id [db id]
-    (es-remove-migration-id (client db) id))
+    (es-remove-migration-id (client db) (get-migration-index db) id))
   (applied-migration-ids [db]
-    (es-get-applied-migrations (client db))))
+    (es-get-applied-migrations (client db) (get-migration-index db))))
 
 (defn ->ESDatabase [target]
-  (map->ElasticSearchDatabase (select-keys (:db target) [:host :port :index])))
+  (map->ElasticSearchDatabase (select-keys (merge target (:db target))
+                                           [:host :port :index :migration-index])))
 
 ;; ============================================================================
 ;; Joplin interface
