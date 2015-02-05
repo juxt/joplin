@@ -2,12 +2,12 @@
   (:use [joplin.elasticsearch.database]))
 
 (defn up [db]
-  (create-index "users"
+  (create-index (client db) "users"
                 :mappings {:pin
                            {:properties
                             {:location {:type "geo_point" :index "no"}}}})
   )
 
 (defn down [db]
-  (rollback-index "users")
+  (rollback-index (client db) "users")
   )
