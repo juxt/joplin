@@ -113,8 +113,19 @@
 (defn client [{:keys [host port]}]
   (es/connect (str "http://" host ":" port)))
 
-(defn native-client [{:keys [host port]}]
-  (esn/connect [[host port]]))
+(defn native-client [{:keys [host port cluster]}]
+  (esn/connect [[host port]] {"cluster.name" cluster}))
+
+(defn wait-for-ready [es-native-client shards]
+  (-> es-native-client
+      .admin
+      .cluster
+      (.prepareHealth (into-array String []))
+      ;; Don't wait for green -- it may never come for the cluster.
+      .setWaitForYellowStatus
+      (.setWaitForActiveShards shards)
+      .execute
+      .actionGet))
 
 (defn find-index-names [es-client alias-name]
   (->> (esi/get-settings es-client)
