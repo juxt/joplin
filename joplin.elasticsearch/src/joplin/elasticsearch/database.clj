@@ -8,6 +8,10 @@
             [clojurewerkz.elastisch.rest.bulk :as bulk]
             [clojurewerkz.elastisch.rest.document :as esd]
             [clojurewerkz.elastisch.rest.index :as esi]
+
+            [clojurewerkz.elastisch.native :as esn]
+            [clojurewerkz.elastisch.native.document :as esnd]
+
             [clojure.walk :refer [stringify-keys]]
             [ragtime.core :refer [Migratable]])
   (:import [org.elasticsearch.action.admin.indices.settings.get GetSettingsRequest]
@@ -82,11 +86,35 @@
                       new-index
                       (bulk/bulk-index updated-docs)))))))))
 
+(defn migrate-data-native
+  ([es-client es-native-client old-index mapping-type new-index]
+     (migrate-data es-client old-index mapping-type new-index identity))
+  ([es-client es-native-client old-index mapping-type new-index trans-f]
+     (dorun
+      (->> (esnd/search es-native-client
+                       old-index
+                       mapping-type
+                       :query {:match_all {}}
+                       :scroll "1m")
+           (esnd/scroll-seq es-native-client)
+           (partition-all 50)
+           (pmap (fn [docs]
+                   (let [updated-docs (map (fn [doc]
+                                             (merge (select-keys doc special-operation-keys)
+                                                    (trans-f (:_source doc))))
+                                           docs)]
+                     (bulk/bulk-with-index
+                      es-client
+                      new-index
+                      (bulk/bulk-index updated-docs)))))))))
 ;; ============================================================================
 ;; Functions for use within migrations
 
 (defn client [{:keys [host port]}]
   (es/connect (str "http://" host ":" port)))
+
+(defn native-client [{:keys [host port]}]
+  (esn/connect [[host port]]))
 
 (defn find-index-names [es-client alias-name]
   (->> (esi/get-settings es-client)

@@ -1,8 +1,14 @@
 (ns seeds.es
-  (:require [clojurewerkz.elastisch.native.document :as esd]
-            [joplin.elasticsearch.database :refer [*es-client*]]))
+  (:require [clojurewerkz.elastisch.rest.document :as esd]
+            [joplin.elasticsearch.database :refer [client native-client migrate-data-native]]))
 
 (defn run [target & args]
-  (esd/put *es-client* "users" "user" "0"
+  (esd/put (client (:db target)) "users" "user" "0"
            {:name "Foo Bar"
-            :email "lol@lol"}))
+            :email "lol@lol"})
+
+  (migrate-data-native
+   (client (:db target))
+   (native-client {:host (get-in target [:db :host])
+                   :port 9300})
+   "users" "user" "users2"))
