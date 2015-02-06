@@ -1,0 +1,46 @@
+postgres:
+  build: postgres-docker
+  environment:
+    POSTGRES_PASSWORD: password
+  ports:
+    - "5432:5432"
+
+elasticsearch:
+  image: dockerfile/elasticsearch:latest
+  ports:
+    - "9200:9200"
+    - "9300:9300"
+
+cassandra:
+  image: poklet/cassandra:latest
+  ports:
+    - "7000:7000"
+    - "7001:7001"
+    - "9160:9160"
+    - "9042:9042"
+    - "7199:7199"
+
+setupcassandra:
+  build: cassandra-docker
+  links:
+    - cassandra
+  command: bash -c "sleep 20 && echo Creating keyspace test && cqlsh cassandra -f init.cql && sleep infinity"
+
+zookeeper:
+  image: jplock/zookeeper:3.4.6
+  ports:
+    - "2181:2181"
+    - "8080:8080"
+
+datomic:
+  build: datomic-docker
+  ports:
+    - "4334:4334"
+    - "4335:4335"
+    - "4336:4336"
+
+# hive:
+#   image: inmobi/docker-hive:latest
+#   ports:
+#     - "10000:10000"
+#     - "9083:9083"

@@ -1,51 +1,65 @@
+;; boot2docker tends to give me this IP
+(def TARGET-HOST "192.168.59.103")
+
+;; check ES
+;; http://192.168.59.103:9200/users/_search?pretty=true&q=*:*
+
 (defproject joplin-example "0.2.7-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [com.h2database/h2 "1.3.160"]]
+  :dependencies [[org.clojure/clojure "1.6.0"]]
   :plugins [[joplin.lein "0.2.7-SNAPSHOT"]]
 
   :source-paths ["src" "joplin"]
 
-  ;; Please note that elastisch and hive doesn't play well together (class path clashes)
-
-  :joplin {
-           :migrators {:sql-mig "joplin/migrators/sql"
+  :joplin {:migrators {:es-mig           "joplin/migrators/es"
+                       :es-data-mig      "joplin/migrators/esdata"
+                       :sql-mig          "joplin/migrators/sql"
                        :imported-sql-mig "resources/imported-migrators/sql"
-                       :jdbc-mig "joplin/migrators/jdbc"
-                       :es-mig "joplin/migrators/es"
-                       :hive-mig "joplin/migrators/hive"
-                       :cass-mig "joplin/migrators/cass"
-                       :dt-mig "joplin/migrators/datomic"}
-           :seeds {:sql-seed "seeds.sql/run"
-                   :imported-sql-seed "imported-seeds.sql/run"
-                   :es-seed "seeds.es/run"
-                   :cass-seed "seeds.cass/run"
-                   :dt-seed "seeds.dt/run"
-                   :zk-seed "seeds.zk/run"}
-           :databases {:sql-dev  {:type :sql, :url "jdbc:h2:mem:test"}
-                       :sql-prod {:type :sql, :url "jdbc:h2:file:prod"}
-                       :jdbc-dev {:type :jdbc, :url "jdbc:h2:file:dev"}
-                       :hive-dev {:type :hive, :subname "//localhost:10000/default"}
+                       :jdbc-mig         "joplin/migrators/jdbc"
+                       :hive-mig         "joplin/migrators/hive"
+                       :cass-mig         "joplin/migrators/cass"
+                       :dt-mig           "joplin/migrators/datomic"}
+           :seeds     {:es-seed           "seeds.es/run"
+                       :sql-seed          "seeds.sql/run"
+                       :imported-sql-seed "imported-seeds.sql/run"
+                       :cass-seed         "seeds.cass/run"
+                       :dt-seed           "seeds.dt/run"
+                       :zk-seed           "seeds.zk/run"}}
 
-                       :dt-dev {:type :dt, :url "datomic:mem://test"}
+  :profiles {:dev
+             {:joplin
+              {:databases    {:dt-dev  {:type :dt, :url ~(str "datomic:free://" TARGET-HOST ":4334/test")}
+                              :sql-dev {:type :sql, :url "jdbc:h2:file:dev"}}
+               :environments {:dev [{:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
+                                    {:db :sql-dev, :migrator :imported-sql-mig, :seed :imported-sql-seed}]}}}
 
-                       :cass-dev {:type :cass, :hosts ["127.0.0.1"], :keyspace "test"}
+             :web-frontend
+             {:dependencies [[postgresql/postgresql "9.3-1101.jdbc4"]]
+              :joplin
+              {:databases    {:es-dev      {:type :es, :host ~TARGET-HOST, :port 9200}
+                              :es-dev-data {:type :es, :host ~TARGET-HOST, :port 9200 :migration-index "migrations-data"}
+                              :es-prod     {:type :es, :host "es-prod", :port 9200}
+                              :sql-dev     {:type :sql, :url ~(str "jdbc:postgresql://" TARGET-HOST "/test?user=postgres&password=password")}
+                              :sql-prod    {:type :sql, :url "jdbc:postgresql://psq-prod/prod?user=prod&password=secret"}}
+               :environments {:dev  [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}
+                                     {:db :es-dev, :migrator :es-mig, :seed :es-seed}
+                                     ;; the same as :es-dev, to enable multiple migration tables
+                                     {:db :es-dev-data, :migrator :es-data-mig}]
+                              :prod [{:db :sql-prod, :migrator :imported-sql-mig, :seed :imported-sql-seed}
+                                     {:db :es-prod, :migrator :es-mig, :seeds :es-seed}]}}}
 
-                       :es-dev   {:type :es, :host "localhost", :port 9200}
-                       :es-data  {:type :es, :host "localhost", :port 9200 :migration-index "migrations-data"}
-                       :es-prod  {:type :es, :host "es-prod", :port 9200}
+             :analysis
+             {:dependencies [[com.h2database/h2 "1.3.171"]]
+              :joplin
+              {:databases    {:cass-dev {:type :cass, :hosts [~TARGET-HOST], :keyspace "test"}
+                              :jdbc-dev {:type :jdbc, :url "jdbc:h2:file:analysis"}
+                              :zk-dev   {:type :zk, :host ~TARGET-HOST, :port 2181, :client :curator}
+                              :zk-prod  {:type :zk, :host "zk-prod", :port 2181, :client :exhibitor}}
+               :environments {:dev  [{:db :cass-dev, :migrator :cass-mig, :seed :cass-seed}
+                                     {:db :jdbc-dev, :migrator :jdbc-mig, :seed :sql-seed}
+                                     {:db :zk-dev, :seed :zk-seed}]
+                              :prod [{:db :zk-prod}]}}}
 
-                       :zk-dev   {:type :zk, :host "localhost", :port 2181, :client :curator}
-                       :zk-prod  {:type :zk, :host "zk-prod", :port 2181, :client :exhibitor}
-                       }
-
-           :environments {:dev [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}
-                                {:db :jdbc-dev, :migrator :jdbc-mig, :seed :sql-seed}
-                                {:db :es-dev, :migrator :es-mig, :seed :es-seed}
-                                {:db :cass-dev, :migrator :cass-mig, :seed :cass-seed}
-                                {:db :hive-dev, :migrator :hive-mig}
-                                {:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
-                                {:db :zk-dev, :seed :zk-seed}]
-                          :prod [{:db :sql-prod, :migrator :imported-sql-mig, :seed :imported-sql-seed}
-                                 {:db :es-prod, :migrator :es-mig}
-                                 {:db :zk-prod}]}
-           })
+             :hive
+             {:joplin
+              {:databases    {:hive-dev {:type :hive, :subname ~(str "//" TARGET-HOST ":10000/default")}}
+               :environments {:dev [{:db :hive-dev, :migrator :hive-mig}]}}}})

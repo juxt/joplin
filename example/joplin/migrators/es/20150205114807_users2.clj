@@ -9,5 +9,5 @@
   )
 
 (defn down [db]
-  (rollback-index (client db) "users")
+  (rollback-index (client db) "users2")
   )
