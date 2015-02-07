@@ -114,7 +114,9 @@
   (es/connect (str "http://" host ":" port)))
 
 (defn native-client [{:keys [host port cluster]}]
-  (esn/connect [[host port]] {"cluster.name" cluster}))
+  (if cluster
+    (esn/connect [[host port]] {"cluster.name" cluster})
+    (esn/connect [[host port]])))
 
 (defn wait-for-ready [es-native-client shards]
   (-> es-native-client

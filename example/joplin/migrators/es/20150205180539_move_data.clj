@@ -4,8 +4,7 @@
 (defn up [db]
   (migrate-data-native
    (client db)
-   (native-client {:host (:host db)
-                   :port 9300})
+   (native-client (assoc db :port 9300))
    "users" "user" "users2")
   )
 
