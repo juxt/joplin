@@ -5,7 +5,7 @@
         :url "https://github.com/juxt/joplin"}
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[leinjacker "0.4.1"]]
+  :dependencies [[leinjacker "0.4.2"]]
 
   :eval-in-leiningen false    ;; The lucene clash (for elasticsearch)
   )
