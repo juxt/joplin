@@ -31,7 +31,7 @@
              {:joplin
               {:databases    {:dt-dev        {:type :dt, :url ~(str "datomic:free://" TARGET-HOST ":4334/test")}
                               :sql-dev       {:type :sql, :url "jdbc:h2:file:dev"}
-                              :sql-dev-extra {:type :sql, :migration-table "ragtime_migrations_extra", :url "jdbc:h2:mem:test"}}
+                              :sql-dev-extra {:type :sql, :migration-table "ragtime_migrations_extra", :url "jdbc:h2:file:dev"}}
                :environments {:dev [{:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
                                     {:db :sql-dev, :migrator :imported-sql-mig, :seed :imported-sql-seed}
                                     {:db :sql-dev-extra, :migrator :sql-mig-extra}]}}}

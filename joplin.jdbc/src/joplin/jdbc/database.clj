@@ -1,64 +1,10 @@
-(ns joplin.jdbc.tmp)
-
 (ns joplin.jdbc.database
   (:use [joplin.core])
-  (:require [clojure.java.io :as io]
-            [ragtime.core :as ragtime :refer [Migratable connection]]
-            [ragtime.sql.files])
-  (:import java.io.FileNotFoundException
-           java.util.Date
-           java.text.SimpleDateFormat))
-
-(defn require-jdbc [ns-alias]
-  (try
-    (require 'clojure.java.jdbc.deprecated)
-    (alias ns-alias 'clojure.java.jdbc.deprecated)
-    (catch FileNotFoundException ex
-      (require 'clojure.java.jdbc)
-      (alias ns-alias 'clojure.java.jdbc))))
-
-(require-jdbc 'sql)
-
+  (:require [joplin.sql.database :refer [map->SqlDatabase get-db *migration-table*]]
+            [ragtime.sql.files]))
 
 (def run-sql-fn @#'ragtime.sql.files/run-sql-fn)
 (def migration-pattern @#'ragtime.sql.files/migration-pattern)
-
-(def ^:dynamic *migration-table* "ragtime_migrations")
-
-(defn ^:internal ensure-migrations-table-exists [db]
-  ;; TODO: is there a portable way to detect table existence?
-  (sql/with-connection db
-    (try
-      (sql/create-table *migration-table*
-                        [:id "varchar(255)"]
-                        [:created_at "varchar(32)"])
-      (catch Exception _))))
-
-(defn format-datetime [dt]
-  (-> (SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS")
-      (.format dt)))
-
-(defrecord SqlDatabase []
-  Migratable
-  (add-migration-id [db id]
-    (sql/with-connection db
-      (ensure-migrations-table-exists db)
-      (sql/insert-values *migration-table*
-                         [:id :created_at]
-                         [(str id) (format-datetime (Date.))])))
-
-  (remove-migration-id [db id]
-    (sql/with-connection db
-      (ensure-migrations-table-exists db)
-      (sql/delete-rows *migration-table* ["id = ?" id])))
-
-  (applied-migration-ids [db]
-    (sql/with-connection db
-      (ensure-migrations-table-exists db)
-      (sql/with-query-results results
-        [(str "SELECT id FROM " *migration-table* " ORDER BY created_at")]
-        (vec (map :id results))))))
-
 
 (defn- migration? [[_ filename]]
   (re-find migration-pattern filename))
@@ -87,14 +33,11 @@
       (println "Warning, no migrators found!"))
     migrations))
 
-;; ============================================================================
-;; SQL driven sql migrations, ragtime style
-
 (defn- get-table [target]
   (or (get-in target [:db :migration-table]) "ragtime_migrations"))
 
-(defn- get-db [target]
-  (map->SqlDatabase {:connection-uri (get-in target [:db :url])}))
+;; ============================================================================
+;; SQL driven sql migrations, ragtime style
 
 (defmethod migrate-db :sql [target & args]
   (binding [*migration-table* (get-table target)]
