@@ -13,8 +13,10 @@
   :joplin {:migrators {:es-mig           "joplin/migrators/es"
                        :es-data-mig      "joplin/migrators/esdata"
                        :sql-mig          "joplin/migrators/sql"
+                       :sql-mig-extra    "joplin/migrators/sql/extrapath"
                        :imported-sql-mig "resources/imported-migrators/sql"
                        :jdbc-mig         "joplin/migrators/jdbc"
+                       :jdbc-mig-extra   "joplin/migrators/jdbc/extrapath"
                        :hive-mig         "joplin/migrators/hive"
                        :cass-mig         "joplin/migrators/cass"
                        :dt-mig           "joplin/migrators/datomic"}
@@ -27,10 +29,12 @@
 
   :profiles {:dev
              {:joplin
-              {:databases    {:dt-dev  {:type :dt, :url ~(str "datomic:free://" TARGET-HOST ":4334/test")}
-                              :sql-dev {:type :sql, :url "jdbc:h2:file:dev"}}
+              {:databases    {:dt-dev        {:type :dt, :url ~(str "datomic:free://" TARGET-HOST ":4334/test")}
+                              :sql-dev       {:type :sql, :url "jdbc:h2:file:dev"}
+                              :sql-dev-extra {:type :sql, :migration-table "ragtime_migrations_extra", :url "jdbc:h2:mem:test"}}
                :environments {:dev [{:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
-                                    {:db :sql-dev, :migrator :imported-sql-mig, :seed :imported-sql-seed}]}}}
+                                    {:db :sql-dev, :migrator :imported-sql-mig, :seed :imported-sql-seed}
+                                    {:db :sql-dev-extra, :migrator :sql-mig-extra}]}}}
 
              :web-frontend
              {:dependencies [[postgresql/postgresql "9.3-1101.jdbc4"]]
@@ -50,12 +54,14 @@
              :analysis
              {:dependencies [[com.h2database/h2 "1.3.171"]]
               :joplin
-              {:databases    {:cass-dev {:type :cass, :hosts [~TARGET-HOST], :keyspace "test"}
-                              :jdbc-dev {:type :jdbc, :url "jdbc:h2:file:analysis"}
-                              :zk-dev   {:type :zk, :host ~TARGET-HOST, :port 2181, :client :curator}
-                              :zk-prod  {:type :zk, :host "zk-prod", :port 2181, :client :exhibitor}}
+              {:databases    {:cass-dev       {:type :cass, :hosts [~TARGET-HOST], :keyspace "test"}
+                              :jdbc-dev       {:type :jdbc, :url "jdbc:h2:file:analysis"}
+                              :jdbc-dev-extra {:type :jdbc, :migration-table "ragtime_migrations_extra", :url "jdbc:h2:file:analysis"}
+                              :zk-dev         {:type :zk, :host ~TARGET-HOST, :port 2181, :client :curator}
+                              :zk-prod        {:type :zk, :host "zk-prod", :port 2181, :client :exhibitor}}
                :environments {:dev  [{:db :cass-dev, :migrator :cass-mig, :seed :cass-seed}
                                      {:db :jdbc-dev, :migrator :jdbc-mig, :seed :sql-seed}
+                                     {:db :jdbc-dev-extra, :migrator :jdbc-mig-extra, :seed :sql-seed}
                                      {:db :zk-dev, :seed :zk-seed}]
                               :prod [{:db :zk-prod}]}}}
 
