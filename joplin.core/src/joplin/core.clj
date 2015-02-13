@@ -8,7 +8,6 @@
             [ragtime.core]
             [ragtime.main]))
 
-
 ;; ==========================================================================
 ;; methods implemented by migrator/seed targets
 
@@ -32,6 +31,10 @@ N is an optional argument and if present should be the first in args."
 (defmulti create-migration
   "Create migrations file(s) for target database described by a joplin database map.
 The first argument must be the name of the migration to create"
+  (fn [target & args] (get-in target [:db :type])))
+
+(defmulti pending-migrations
+  "Return a list of pending migrations."
   (fn [target & args] (get-in target [:db :type])))
 
 ;; ==========================================================================
@@ -116,6 +119,11 @@ or resource folders inside a jar on the classpath"
           :up (load-var (str ns "/up"))
           :down (load-var (str ns "/down"))})))))
 
+(defn- get-pending-migrations [db migrations]
+  (let [migrations         (->> migrations (map :id) set)
+        applied-migrations (set (ragtime.core/applied-migration-ids db))]
+    (clojure.set/difference migrations applied-migrations)))
+
 (defn do-migrate
   "Perform migration on a database"
   [migrations db]
@@ -138,14 +146,13 @@ or resource folders inside a jar on the classpath"
   [migrations db target args]
   (println "Seeding" db)
   (when-let [seed-fn (and (:seed target) (load-var (:seed target)))]
-    (let [migrations (->> migrations (map :id) set)
-          applied-migrations (set (ragtime.core/applied-migration-ids db))]
+    (let [pending-migrations (get-pending-migrations db migrations)]
 
       (cond
-       (not= (count migrations) (count applied-migrations))
+       (not-empty pending-migrations)
        (do
-         (println "There are" (- (count migrations) (count applied-migrations)) "pending migration(s)")
-         (println (clojure.set/difference migrations applied-migrations)))
+         (println "There are" (count pending-migrations) "pending migration(s)")
+         (println pending-migrations))
 
        seed-fn
        (do
@@ -198,3 +205,6 @@ or resource folders inside a jar on the classpath"
                          [migration-id]))) ns))
         (catch Exception e
           (println "Error creating file" path))))))
+
+(defn do-pending-migrations [db migrations]
+  (println "Pending migrations" (get-pending-migrations db migrations)))

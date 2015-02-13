@@ -283,3 +283,7 @@
 
 (defmethod create-migration :es [target & [id]]
   (do-create-migration target id "joplin.elasticsearch.database"))
+
+(defmethod pending-migrations :es [target & args]
+  (do-pending-migrations (->ESDatabase target)
+                         (get-migrations (:migrator target))))

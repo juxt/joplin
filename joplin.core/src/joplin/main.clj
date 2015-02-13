@@ -58,7 +58,7 @@ Options:
       (println "Could not find any matching targets")
       (System/exit 1))
 
-    (when (and (#{"rollback", "reset", "create"} command)
+    (when (and (#{"rollback", "reset", "create" "pending"} command)
                (nil? database))
       (println "This command requires a valid database")
       (System/exit 1))
@@ -75,6 +75,8 @@ Options:
       "rollback" (apply rollback-db (first targets) clean-args)
       "reset"    (apply reset-db (first targets) clean-args)
       "create"   (apply create-migration (first targets) clean-args)
+
+      "pending"  (run-op pending-migrations targets clean-args)
 
       "help"     (println help-text)
       (do (println help-text)

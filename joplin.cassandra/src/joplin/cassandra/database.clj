@@ -70,3 +70,7 @@
 
 (defmethod create-migration :cass [target & [id]]
   (do-create-migration target id "joplin.cassandra.database"))
+
+(defmethod pending-migrations :cass [target & args]
+  (do-pending-migrations (->CassDatabase target)
+                         (get-migrations (:migrator target))))

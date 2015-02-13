@@ -84,3 +84,7 @@
 
 (defmethod joplin/create-migration :hive [target & [id]]
   (joplin/do-create-migration target id "joplin.hive.database"))
+
+(defmethod pending-migrations :hive [target & args]
+  (do-pending-migrations (->HiveDatabase target)
+                         (get-migrations (:migrator target))))

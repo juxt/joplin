@@ -68,6 +68,11 @@
     (println "creating" path-down)
     (spit path-down "SELECT 2")))
 
+(defmethod pending-migrations :sql [target & args]
+  (binding [*migration-table* (get-table target)]
+    (do-pending-migrations (get-db target)
+                           (get-migrations (:migrator target)))))
+
 ;; ============================================================================
 ;; Code driven sql migrations
 
@@ -97,3 +102,8 @@
 
 (defmethod create-migration :jdbc [target & [id]]
   (do-create-migration target id "joplin.jdbc.database"))
+
+(defmethod pending-migrations :jdbc [target & args]
+  (binding [*migration-table* (get-table target)]
+    (do-pending-migrations (map->SqlDatabase (append-uri target))
+                           (get-migrations (:migrator target)))))

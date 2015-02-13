@@ -91,3 +91,7 @@
 
 (defmethod create-migration :dt [target & [id]]
   (do-create-migration target id "joplin.datomic.database"))
+
+(defmethod pending-migrations :dt [target & args]
+  (do-pending-migrations (->DTDatabase target)
+                         (get-migrations (:migrator target))))
