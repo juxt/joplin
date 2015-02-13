@@ -1,3 +1,30 @@
+## 0.2.8
+
+### New features
+* New lein command 'pending' to list pending migrations
+
+### Minor changes
+* JDBC; support for multiple migration tables
+
+## 0.2.7
+
+### New features
+* Vastly improved examples
+
+### Minor changes
+* Elasticsearch; native client support for migrating data
+
+## 0.2.6
+
+### Minor changes
+* Elasticsearch; support for multiple migration indicies
+
+## 0.2.5
+
+### Minor changes
+* Elasticsearch; expose index from config
+* joplin.cassandra/cassaforte 2.0.0
+
 ## 0.2.3
 
 ### Breaking changes
