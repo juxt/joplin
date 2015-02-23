@@ -1,4 +1,4 @@
-(defproject joplin.lein "0.2.9"
+(defproject joplin.lein "0.2.10-SNAPSHOT"
   :description "Joplin Leiningen plugin"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
