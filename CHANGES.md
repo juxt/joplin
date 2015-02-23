@@ -1,3 +1,9 @@
+## 0.2.9
+
+### Fixes
+
+* Bug in elasticsearch native-client code
+
 ## 0.2.8
 
 ### New features
