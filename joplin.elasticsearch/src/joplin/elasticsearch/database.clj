@@ -88,7 +88,7 @@
 
 (defn migrate-data-native
   ([es-client es-native-client old-index mapping-type new-index]
-     (migrate-data es-client old-index mapping-type new-index identity))
+     (migrate-data-native es-client old-index mapping-type new-index identity))
   ([es-client es-native-client old-index mapping-type new-index trans-f]
      (dorun
       (->> (esnd/search es-native-client
@@ -113,10 +113,11 @@
 (defn client [{:keys [host port]}]
   (es/connect (str "http://" host ":" port)))
 
-(defn native-client [{:keys [host port cluster]}]
-  (if cluster
-    (esn/connect [[host port]] {"cluster.name" cluster})
-    (esn/connect [[host port]])))
+(defn native-client [{:keys [host port native-port cluster]}]
+  (let [es-port (or native-port port)]
+    (if cluster
+      (esn/connect [[host es-port]] {"cluster.name" cluster})
+      (esn/connect [[host es-port]]))))
 
 (defn wait-for-ready [es-native-client shards]
   (-> es-native-client
@@ -249,7 +250,7 @@
 ;; ============================================================================
 ;; Ragtime interface
 
-(defrecord ElasticSearchDatabase [host port index migration-index]
+(defrecord ElasticSearchDatabase [host port index migration-index cluster native-port]
   Migratable
   (add-migration-id [db id]
     (es-add-migration-id (client db) (get-migration-index db) id))
@@ -260,7 +261,7 @@
 
 (defn ->ESDatabase [target]
   (map->ElasticSearchDatabase (select-keys (merge target (:db target))
-                                           [:host :port :index :migration-index])))
+                                           [:host :port :index :migration-index :cluster :native-port])))
 
 ;; ============================================================================
 ;; Joplin interface
