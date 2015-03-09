@@ -105,7 +105,7 @@ Note that reset will only work properly if all down migrations do a complete cle
 
 Create a new migration scaffold file for a single database in an environment. This command requires that you specify both a database and identification string of the migrations.
 
-- `lein joplin pedning ENV DB`
+- `lein joplin pending ENV DB`
 
 Print pending migrations for a databases in an environment.
 
