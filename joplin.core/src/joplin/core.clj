@@ -184,6 +184,7 @@ or resource folders inside a jar on the classpath"
   [target id ns]
   (when (:migrator target)
     (let [migration-id (get-full-migrator-id id)
+          ns-name (string/replace migration-id "_" "-")
           path (str (:migrator target) "/"
                     (string/replace migration-id "-" "_")
                     ".clj")]
@@ -202,7 +203,7 @@ or resource folders inside a jar on the classpath"
 " (apply str (interpose "."
                         (concat
                          (-> (:migrator target) (string/split #"/") rest)
-                         [migration-id]))) ns))
+                         [ns-name]))) ns))
         (catch Exception e
           (println "Error creating file" path))))))
 
