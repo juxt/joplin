@@ -107,7 +107,7 @@ Create a new migration scaffold file for a single database in an environment. Th
 
 - `lein joplin pending ENV DB`
 
-Print pending migrations for a databases in an environment.
+Print pending migrations for a database in an environment.
 
 ### Writing migrators
 
