@@ -162,7 +162,7 @@ You may also specify your migrations as Clojure namespaces, like the example for
 
 Seed functions are always placed in a clojure source file. The source file can contain any number of functions, since a seed definition is the name of a clojure var referencing a function.
 
-The seed function are called with the target map (see below) as it's first parameter and any number of additional parameter that were passed into the lein plugin invocation (or to the multi-method if called programatically).
+The seed function are called with the target map (see below) as its first parameter and any number of additional parameter that were passed into the lein plugin invocation (or to the multi-method if called programatically).
 
 Example of a seed function;
 ```clojure
@@ -181,7 +181,7 @@ The target map will consist of 3 keys; `:db, :migrator, :seed`. The contents of 
 
 Calling joplin from your code requires that you have loaded the `joplin.core` namespace and also the namespaces of the database plugins you intend to use. Then you can call one of 5 multi-methods to perform the same 5 actions as described above in the leiningen plugin section. The multi-methods are; `joplin.core/migrate-db`, `joplin.core/rollback-db`, `joplin.core/seed-db`, `joplin.core/reset-db`, `joplin.core/create-migration`.
 
-All the multi-methods takes a `target` map as it's first argument and additional optional arguments.
+All the multi-methods takes a `target` map as its first argument and additional optional arguments.
 
 The target map must have this shape;
 ```
