@@ -195,13 +195,51 @@ The `:migrator` and/or `:seed` keys are optional (joplin can't do much if both a
 
 For example;
 ```
-{:db {:type :dt, :url "datomic:mem://test"}
- :migrator "joplin/migrators/datomic"
- :seed "seeds.dt/run"
-}
+(ns example
+  (:require [joplin.core :as joplin]
+            [joplin.dt.database]))
+
+(joplin/migrate-db
+  {:db {:type :dt,
+        :url "datomic:mem://test"}
+   :migrator "joplin/migrators/datomic"
+   :seed "seeds.dt/run"})
 ```
 
-Valid database types are `:jdbc, :sql, :es, :zk, :dt, :cass`. Note that it's easy to [extend joplin](https://github.com/juxt/joplin/wiki/Adding-a-new-database-type) to handle more database types and thus introduce more valid database types.
+Provided database types and their respective plugins;
+
+<table>
+  <tr>
+    <th>{:db {:type ? ...</th>
+    <th>:require [?]</th>
+  </tr>
+  <tr>
+    <td>:jdbc</td>
+    <td>joplin.jdbc.database</td>
+  </tr>
+  <tr>
+    <td>:sql</td>
+    <td>joplin.jdbc.database</td>
+  </tr>
+  <tr>
+    <td>:es</td>
+    <td>joplin.elasticsearch.database</td>
+  </tr>
+  <tr>
+    <td>:zk</td>
+    <td>joplin.zookeeper.database</td>
+  </tr>
+  <tr>
+    <td>:dt</td>
+    <td>joplin.dt.database</td>
+  </tr>
+  <tr>
+    <td>:dt</td>
+    <td>joplin.cassandra.database</td>
+  </tr>
+</table>
+
+Note that it's easy to [extend joplin](https://github.com/juxt/joplin/wiki/Adding-a-new-database-type) to handle more database types and thus introduce more valid database types.
 
 ### Hacking joplin
 
