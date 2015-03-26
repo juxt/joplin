@@ -3,7 +3,7 @@
             [clj-time.format :as f]
             [clojure.java.classpath :as classpath]
             [clojure.java.io :as io]
-            [clojure.set]
+            [clojure.set :as set]
             [clojure.string :as string]
             [ragtime.core]
             [ragtime.main]))
@@ -121,8 +121,11 @@ or resource folders inside a jar on the classpath"
 
 (defn- get-pending-migrations [db migrations]
   (let [migrations         (->> migrations (map :id) set)
-        applied-migrations (set (ragtime.core/applied-migration-ids db))]
-    (clojure.set/difference migrations applied-migrations)))
+        applied-migrations (set (ragtime.core/applied-migration-ids db))
+        not-applied        (set/difference migrations applied-migrations)
+        not-defined        (set/difference applied-migrations migrations)]
+    (concat not-applied
+            (map #(str % "!MIGRATOR-MISSING!") not-defined))))
 
 (defn do-migrate
   "Perform migration on a database"
