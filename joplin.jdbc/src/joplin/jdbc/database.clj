@@ -71,7 +71,7 @@
 (defmethod pending-migrations :sql [target & args]
   (binding [*migration-table* (get-table target)]
     (do-pending-migrations (get-db target)
-                           (get-migrations (:migrator target)))))
+                           (get-sql-migrations (:migrator target)))))
 
 ;; ============================================================================
 ;; Code driven sql migrations
