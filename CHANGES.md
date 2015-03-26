@@ -1,7 +1,14 @@
+## 0.2.10
+
+### Minor changes
+* pending migrations now returns info about missing (but applied) migrators
+
+### Fixes
+* pending migrations not working for :type :sql
+
 ## 0.2.9
 
 ### Fixes
-
 * Bug in elasticsearch native-client code
 
 ## 0.2.8
