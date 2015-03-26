@@ -28,7 +28,8 @@
                        :zk-seed           "seeds.zk/run"}}
 
   :profiles {:dev
-             {:joplin
+             {:dependencies [[com.h2database/h2 "1.3.171"]]
+              :joplin
               {:databases    {:dt-dev        {:type :dt, :url ~(str "datomic:free://" TARGET-HOST ":4334/test")}
                               :sql-dev       {:type :sql, :url "jdbc:h2:file:dev"}
                               :sql-dev-extra {:type :sql, :migration-table "ragtime_migrations_extra", :url "jdbc:h2:file:dev"}}
