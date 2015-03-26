@@ -4,9 +4,9 @@
 ;; check ES
 ;; http://192.168.59.103:9200/users/_search?pretty=true&q=*:*
 
-(defproject joplin-example "0.2.10-SNAPSHOT"
+(defproject joplin-example "0.2.10"
   :dependencies [[org.clojure/clojure "1.6.0"]]
-  :plugins [[joplin.lein "0.2.10-SNAPSHOT"]]
+  :plugins [[joplin.lein "0.2.10"]]
 
   :source-paths ["src" "joplin"]
 
