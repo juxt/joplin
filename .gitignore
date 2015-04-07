@@ -3,6 +3,7 @@ classes/
 checkouts/
 pom.xml
 pom.xml.asc
+.DS_Store
 *.jar
 *.class
 .lein-*

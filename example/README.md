@@ -6,9 +6,9 @@ The `project.clj` shows how to configure Joplin, and use leiningen profiles to s
 
 ### Usage
 
-Install [Docker](http://docker.io), [Fig](http://fig.sh) and [boot2docker](http://boot2docker.io) (if you want to run locally).
+Install [Docker](http://docker.io), [Docker Compose](https://docs.docker.com/compose/) and perhaps [Docker Machine](https://docs.docker.com/machine/).
 
-`$ fig up`
+`$ docker-compose up`
 
 This will bring up all databases, please note that will require a fair amount of RAM in the docker machine. If it runs out consider editing the `fig.yml` file to only start the databases you care about.
 
