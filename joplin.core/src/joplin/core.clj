@@ -6,7 +6,8 @@
             [clojure.set :as set]
             [clojure.string :as string]
             [ragtime.core]
-            [ragtime.main]))
+            [ragtime.main]
+            [ragtime.strategy]))
 
 ;; ==========================================================================
 ;; methods implemented by migrator/seed targets
@@ -119,13 +120,18 @@ or resource folders inside a jar on the classpath"
           :up (load-var (str ns "/up"))
           :down (load-var (str ns "/down"))})))))
 
+
+(def split-at-conflict @#'ragtime.strategy/split-at-conflict)
+
 (defn- get-pending-migrations [db migrations]
-  (let [migrations         (->> migrations (map :id) set)
-        applied-migrations (set (ragtime.core/applied-migration-ids db))
-        not-applied        (set/difference migrations applied-migrations)
-        not-defined        (set/difference applied-migrations migrations)]
-    (concat not-applied
-            (map #(str % "!MIGRATOR-MISSING!") not-defined))))
+  (let [migrations            (map :id migrations)
+        applied-migrations    (ragtime.core/applied-migration-ids db)
+        not-applied           (set/difference (set migrations) (set applied-migrations))
+        [conflicts unapplied] (split-at-conflict applied-migrations migrations)]
+    (when (seq conflicts)
+      (throw (Exception. (str "Conflict! Expected " (first unapplied)
+                              " but " (first conflicts) " was applied."))))
+    (sort not-applied)))
 
 (defn do-migrate
   "Perform migration on a database"
