@@ -1,3 +1,8 @@
+## 0.2.11
+
+### Minor changes
+* pending migrations enforces the ordering invariant, and can be used to check for inconsistencies without running the migrations
+
 ## 0.2.10
 
 ### Minor changes
