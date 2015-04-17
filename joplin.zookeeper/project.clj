@@ -1,4 +1,4 @@
-(defproject joplin.zookeeper "0.2.11"
+(defproject joplin.zookeeper "0.2.12-SNAPSHOT"
   :description "ZooKeeper support for Joplin"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
@@ -10,5 +10,5 @@
                  [org.apache.zookeeper/zookeeper "3.4.6" :exclusions [commons-codec com.sun.jmx/jmxri
                                                                       com.sun.jdmk/jmxtools javax.jms/jms
                                                                       org.slf4j/slf4j-log4j12 log4j]]
-                 [joplin.core "0.2.11"]
+                 [joplin.core "0.2.12-SNAPSHOT"]
                  [curator "0.0.2"]])
