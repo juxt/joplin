@@ -19,8 +19,7 @@
     (catch AlreadyExistsException e)))
 
 (defn get-connection [hosts keyspace]
-  (when-let [conn (cc/connect hosts)]
-    (cql/use-keyspace conn keyspace)
+  (when-let [conn (cc/connect hosts keyspace)]
     conn))
 
 ;; ============================================================================
