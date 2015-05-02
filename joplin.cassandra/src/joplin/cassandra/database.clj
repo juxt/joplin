@@ -19,9 +19,13 @@
     (catch AlreadyExistsException e)))
 
 (defn get-connection [hosts keyspace]
-  (when-let [conn (cc/connect hosts)]
-    (cql/use-keyspace conn keyspace)
-    conn))
+  (cc/connect hosts keyspace))
+
+(defn with-connection [hosts keyspace f]
+  (when-let [conn (cc/connect hosts keyspace)]
+    (try
+      (f conn)
+      (finally (cc/disconnect! conn)))))
 
 ;; ============================================================================
 ;; Ragtime interface
@@ -29,22 +33,28 @@
 (defrecord CassandraDatabase [hosts keyspace]
   Migratable
   (add-migration-id [db id]
-    (ensure-migration-schema (get-connection hosts keyspace))
-    (cql/insert (get-connection hosts keyspace)
-                "migrations"
-                {:id id, :created_at (java.util.Date.)}))
+    (with-connection hosts keyspace
+      (fn [conn]
+        (ensure-migration-schema conn)
+        (cql/insert conn
+                    "migrations"
+                    {:id id, :created_at (java.util.Date.)}))))
   (remove-migration-id [db id]
-    (ensure-migration-schema (get-connection hosts keyspace))
-    (cql/delete (get-connection hosts keyspace)
-                "migrations"
-                (cq/where {:id id})))
+    (with-connection hosts keyspace
+      (fn [conn]
+        (ensure-migration-schema conn)
+        (cql/delete conn
+                    "migrations"
+                    (cq/where {:id id})))))
 
   (applied-migration-ids [db]
-    (ensure-migration-schema (get-connection hosts keyspace))
-    (->> (cql/select (get-connection hosts keyspace)
-                     "migrations")
-         (sort-by :created_at)
-         (map :id))))
+    (with-connection hosts keyspace
+      (fn [conn]
+        (ensure-migration-schema conn)
+        (->> (cql/select conn
+                         "migrations")
+             (sort-by :created_at)
+             (map :id))))))
 
 (defn- ->CassDatabase [target]
   (map->CassandraDatabase (select-keys (:db target) [:hosts :keyspace])))
