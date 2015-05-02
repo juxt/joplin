@@ -234,7 +234,7 @@ Provided database types and their respective plugins;
     <td>joplin.dt.database</td>
   </tr>
   <tr>
-    <td>:dt</td>
+    <td>:cass</td>
     <td>joplin.cassandra.database</td>
   </tr>
 </table>
