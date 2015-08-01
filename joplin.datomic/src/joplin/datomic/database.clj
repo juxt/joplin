@@ -50,11 +50,11 @@
   (remove-migration-id [db id]
     (when-let [conn (get-connection (:url db))]
       (ensure-migration-schema conn)
-      (when-let [mig (first (d/q '[:find ?e
-                                   :in $ ?id
-                                   :where
-                                   [?e :migrations/id ?id]]
-                                 (d/db conn) id))]
+      (when-let [mig (d/q '[:find ?e .
+                            :in $ ?id
+                            :where
+                            [?e :migrations/id ?id]]
+                          (d/db conn) id)]
         @(d/transact conn [[:db.fn/retractEntity mig]]))))
   (applied-migration-ids [db]
     (when-let [conn (get-connection (:url db))]
