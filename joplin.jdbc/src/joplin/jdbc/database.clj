@@ -77,7 +77,10 @@
 ;; Code driven sql migrations
 
 (defn- append-uri [target]
-  (assoc target :connection-uri (get-in target [:db :url])))
+  (-> (:db target)
+      (select-keys [:url :datasource])
+      (clojure.set/rename-keys {:url :connection-uri})
+      (merge target)))
 
 (defmethod migrate-db :jdbc [target & args]
   (binding [*migration-table* (get-table target)]
