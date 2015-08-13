@@ -260,8 +260,7 @@
     (es-get-applied-migrations (client db) (get-migration-index db))))
 
 (defn ->ESDatabase [target]
-  (map->ElasticSearchDatabase (select-keys (merge target (:db target))
-                                           [:host :port :index :migration-index :cluster :native-port])))
+  (map->ElasticSearchDatabase (merge target (:db target))))
 
 ;; ============================================================================
 ;; Joplin interface
