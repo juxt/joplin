@@ -65,8 +65,7 @@
 
 (defmethod migrate-db :cass [target & args]
   (apply do-migrate (get-migrations (:migrator target))
-         (->CassDatabase target)
-         args))
+         (->CassDatabase target) args))
 
 (defmethod rollback-db :cass [target amount-or-id & args]
   (apply do-rollback (get-migrations (:migrator target))
@@ -80,5 +79,5 @@
   (do-pending-migrations (->CassDatabase target)
                          (get-migrations (:migrator target))))
 
-(defmethod create-migration :cass [target & [id]]
+(defmethod create-migration :cass [target id & args]
   (do-create-migration target id "joplin.cassandra.database"))

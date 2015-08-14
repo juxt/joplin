@@ -32,12 +32,12 @@ zookeeper:
     - "2181:2181"
     - "8080:8080"
 
-# datomic:
-#   build: datomic-docker
-#   ports:
-#     - "4334:4334"
-#     - "4335:4335"
-#     - "4336:4336"
+datomic:
+  build: datomic-docker
+  ports:
+    - "4334:4334"
+    - "4335:4335"
+    - "4336:4336"
 
 # hive:
 #   image: inmobi/docker-hive:latest

@@ -1,7 +1,7 @@
 (ns joplin.datomic.database
-  (:use [joplin.core])
   (:require [datomic.api :as d]
-            [ragtime.core :refer [Migratable]]))
+            [joplin.core :refer :all]
+            [ragtime.protocols :refer [DataStore]]))
 
 (defn transact-schema [conn schema]
   @(d/transact conn schema))
@@ -40,7 +40,7 @@
 ;; Ragtime interface
 
 (defrecord DatomicDatabase [url]
-  Migratable
+  DataStore
   (add-migration-id [db id]
     (when-let [conn (get-connection (:url db))]
       (ensure-migration-schema conn)
@@ -74,24 +74,20 @@
 ;; Joplin interface
 
 (defmethod migrate-db :dt [target & args]
-  (do-migrate (get-migrations (:migrator target)) (->DTDatabase target)))
+  (apply do-migrate (get-migrations (:migrator target))
+         (->DTDatabase target) args))
 
-(defmethod rollback-db :dt [target & [n]]
-  (do-rollback (get-migrations (:migrator target))
-               (->DTDatabase target)
-               n))
+(defmethod rollback-db :dt [target amount-or-id & args]
+  (apply do-rollback (get-migrations (:migrator target))
+         (->DTDatabase target) amount-or-id args))
 
 (defmethod seed-db :dt [target & args]
-  (let [migrations (get-migrations (:migrator target))]
-    (do-seed-fn migrations (->DTDatabase target) target args)))
-
-(defmethod reset-db :dt [target & args]
-  (do-reset (get-migrations (:migrator target))
-            (->DTDatabase target) target args))
-
-(defmethod create-migration :dt [target & [id]]
-  (do-create-migration target id "joplin.datomic.database"))
+  (apply do-seed-fn (get-migrations (:migrator target))
+         (->DTDatabase target) target args))
 
 (defmethod pending-migrations :dt [target & args]
   (do-pending-migrations (->DTDatabase target)
                          (get-migrations (:migrator target))))
+
+(defmethod create-migration :dt [target id & args]
+  (do-create-migration target id "joplin.datomic.database"))

@@ -78,8 +78,8 @@
     (run-op pending-migrations targets args)
     (println "No targets found")))
 
-(defn create [conf env database & args]
+(defn create [conf env database id & args]
   (require-joplin-ns conf)
   (if-let [[target] (get-targets conf env database)]
-    (apply create-migration target args)
+    (apply create-migration target id args)
     (println "No targets found")))

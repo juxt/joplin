@@ -5,6 +5,18 @@
 
 ;; check out resauce
 
+;; Datomic
+(comment
+  (def conf (-> (io/resource "joplin-dt.edn")
+                repl/load-config
+                (update-in [:databases :dt-dev]
+                           (fn [m]
+                             (assoc m :url (format (:urlf m) (:host m)))))
+                (assoc-in [:databases :dt-dev :url] "datomic:mem://foo")))
+  (repl/reset conf :dev)
+
+  )
+
 ;; ES
 (comment
   (def conf (repl/load-config
@@ -37,6 +49,12 @@
 
   ;; Reset cassandra
   (repl/reset conf :dev :cass-dev)
+
+  ;; Create migration
+  (repl/create conf :dev :cass-dev "foo")
+
+  ;; See pending
+  (repl/pending conf :dev :cass-dev)
 
   )
 

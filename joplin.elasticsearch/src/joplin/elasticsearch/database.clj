@@ -264,8 +264,7 @@
 
 (defmethod migrate-db :es [target & args]
   (apply do-migrate (get-migrations (:migrator target))
-         (->ESDatabase target)
-         args))
+         (->ESDatabase target) args))
 
 (defmethod rollback-db :es [target amount-or-id & args]
   (apply do-rollback (get-migrations (:migrator target))
@@ -279,5 +278,5 @@
   (do-pending-migrations (->ESDatabase target)
                          (get-migrations (:migrator target))))
 
-(defmethod create-migration :es [target & [id]]
+(defmethod create-migration :es [target id & args]
   (do-create-migration target id "joplin.elasticsearch.database"))

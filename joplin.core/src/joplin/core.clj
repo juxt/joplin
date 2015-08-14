@@ -32,7 +32,7 @@ N is an optional argument and if present should be the first in args."
 (defmulti create-migration
   "Create migrations file(s) for target database described by a joplin database map.
 The first argument must be the name of the migration to create"
-  (fn [target & args] (get-in target [:db :type])))
+  (fn [target id & args] (get-in target [:db :type])))
 
 (defmulti pending-migrations
   "Return a list of pending migrations."
