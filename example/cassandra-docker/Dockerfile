@@ -1,2 +1,2 @@
-FROM poklet/cassandra:latest
+FROM cassandra:latest
 ADD init.cql init.cql

@@ -1,13 +1,17 @@
 (ns joplin.core
-  (:require [clj-time.core :as t]
-            [clj-time.format :as f]
-            [clojure.java.classpath :as classpath]
-            [clojure.java.io :as io]
+  (:require [clj-time
+             [core :as t]
+             [format :as f]]
+            [clojure.java
+             [classpath :as classpath]
+             [io :as io]]
             [clojure.set :as set]
             [clojure.string :as string]
-            [ragtime.core]
-            [ragtime.main]
-            [ragtime.strategy]))
+            [ragtime
+             [core]
+             [protocols]
+             [repl]
+             [strategy]]))
 
 ;; ==========================================================================
 ;; methods implemented by migrator/seed targets
@@ -19,14 +23,10 @@
 (defmulti rollback-db
   "Rollback target database described by a joplin database map N steps.
 N is an optional argument and if present should be the first in args."
-  (fn [target & args] (get-in target [:db :type])))
+  (fn [target amount-or-id & args] (get-in target [:db :type])))
 
 (defmulti seed-db
   "Migrate target database described by a joplin database map."
-  (fn [target & args] (get-in target [:db :type])))
-
-(defmulti reset-db
-  "Reset (re-migrate and seed) target database described by a joplin database map."
   (fn [target & args] (get-in target [:db :type])))
 
 (defmulti create-migration
@@ -41,23 +41,22 @@ The first argument must be the name of the migration to create"
 ;; ==========================================================================
 ;; Helpers
 
-(def verbose-migration @#'ragtime.main/verbose-migration)
-
-(defn load-var
-  "Load a var specified by a string"
-  [v]
-  (try
-    (@#'ragtime.main/load-var v)
-    (catch Exception e
-      (println (format "Function '%s' not found" v))
-      (println (.getMessage e)))))
-
-(defn get-full-migrator-id
+(defn- get-full-migrator-id
   "Get a string with current date and time prepended"
   [id]
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
-(defn get-files
+(defn- load-var
+  "Load a var specified by a string"
+  [var-name]
+  (try
+    (let [var-sym (symbol var-name)]
+      (require (-> var-sym namespace symbol))
+      (find-var var-sym))
+    (catch Exception e
+      (printf "Function '%s' not found. %s\n" var-name (.getMessage e)))))
+
+(defn- get-files
   "Get migrations files given a folder path.
 Will try to locate files on the local filesystem, folder on the classpath
 or resource folders inside a jar on the classpath"
@@ -105,27 +104,32 @@ or resource folders inside a jar on the classpath"
            sort
            (mapv #(vector % (symbol (str ns "." %))))))))
 
+(defrecord JoplinMigration [id up down]
+  ragtime.protocols/Migration
+  (id [_] id)
+  (run-up! [_ db] (up db))
+  (run-down! [_ db] (down db)))
+
 (defn get-migrations
   "Get all seq of ragtime migrators given a path
 (will scan the filesystem and classpath)"
   [path]
   (let [migration-namespaces (get-migration-namespaces path)]
     (when (empty? migration-namespaces)
-      (println "Warning, no migrators found!"))
+      (println "No migrators found"))
     (for [[id ns] migration-namespaces]
       (do
         (require ns)
-        (verbose-migration
-         {:id id
-          :up (load-var (str ns "/up"))
-          :down (load-var (str ns "/down"))})))))
+        (map->JoplinMigration {:id   id
+                               :up   @(load-var (str ns "/up"))
+                               :down @(load-var (str ns "/down"))})))))
 
 
 (def split-at-conflict @#'ragtime.strategy/split-at-conflict)
 
 (defn- get-pending-migrations [db migrations]
   (let [migrations            (map :id migrations)
-        applied-migrations    (ragtime.core/applied-migration-ids db)
+        applied-migrations    (ragtime.protocols/applied-migration-ids db)
         not-applied           (set/difference (set migrations) (set applied-migrations))
         [conflicts unapplied] (split-at-conflict applied-migrations migrations)]
     (when (seq conflicts)
@@ -135,24 +139,24 @@ or resource folders inside a jar on the classpath"
 
 (defn do-migrate
   "Perform migration on a database"
-  [migrations db]
+  [migrations db & [opts]]
   (println "Migrating" db)
-  (ragtime.core/migrate-all db migrations))
+  (ragtime.repl/migrate (merge {:datastore  db
+                                :migrations migrations}
+                               opts)))
 
 (defn do-rollback
   "Perform rollback on a database"
-  [migrations db n]
+  [migrations db amount-or-id & [opts]]
   (println "Rolling back" db)
-  (doseq [m migrations]
-    (ragtime.core/remember-migration m))
-  (ragtime.core/rollback-last db (cond
-                                  (string? n) (Integer/parseInt n)
-                                  (number? n) n
-                                  :else 1)))
+  (ragtime.repl/rollback (merge {:datastore  db
+                                 :migrations migrations}
+                                opts)
+                         amount-or-id))
 
 (defn do-seed-fn
   "Run a seeder function with migration check"
-  [migrations db target args]
+  [migrations db target & args]
   (println "Seeding" db)
   (when-let [seed-fn (and (:seed target) (load-var (:seed target)))]
     (let [pending-migrations (get-pending-migrations db migrations)]
@@ -160,33 +164,19 @@ or resource folders inside a jar on the classpath"
       (cond
        (not-empty pending-migrations)
        (do
-         (println "There are" (count pending-migrations) "pending migration(s)")
+         (printf "There are %d pending migration(s)\n" (count pending-migrations))
          (println pending-migrations))
 
        seed-fn
        (do
-         (println "Applying seed function" (:seed target))
+         (printf "Applying seed function %s\n" (:seed target))
          (apply seed-fn target args))
 
        :else
-       (println "Skipping" (:seed target))))))
+       (printf "Skipping %s\n" (:seed target))))))
 
-(defn do-reset
-  "Perform a reset on a database"
-  [migrations db target args]
-
-  (println "Resetting" db)
-  (doseq [m migrations]
-    (ragtime.core/remember-migration m))
-
-  ;; Roll back all
-  (ragtime.core/rollback-last db Integer/MAX_VALUE)
-
-  ;; Migrate
-  (apply migrate-db target args)
-
-  ;; Seed
-  (apply seed-db target args))
+(defn do-pending-migrations [db migrations]
+  (println "Pending migrations" (get-pending-migrations db migrations)))
 
 (defn do-create-migration
   "Create a scaffold migrator file"
@@ -214,7 +204,4 @@ or resource folders inside a jar on the classpath"
                          (-> (:migrator target) (string/split #"/") rest)
                          [ns-name]))) ns))
         (catch Exception e
-          (println "Error creating file" path))))))
-
-(defn do-pending-migrations [db migrations]
-  (println "Pending migrations" (get-pending-migrations db migrations)))
+          (println "Error creating file %s" path))))))

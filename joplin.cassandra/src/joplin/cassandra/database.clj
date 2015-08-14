@@ -1,10 +1,11 @@
 (ns joplin.cassandra.database
-  (:use [joplin.core])
-  (:require [clojurewerkz.cassaforte.client :as cc]
-            [clojurewerkz.cassaforte.cql    :as cql]
-            [clojurewerkz.cassaforte.query  :as cq]
-            [ragtime.core :refer [Migratable]])
-  (:import [com.datastax.driver.core.exceptions AlreadyExistsException]))
+  (:require [clojurewerkz.cassaforte
+             [client :as cc]
+             [cql :as cql]
+             [query :as cq]]
+            [joplin.core :refer :all]
+            [ragtime.protocols :refer [DataStore]])
+  (:import com.datastax.driver.core.exceptions.AlreadyExistsException))
 
 ;; =============================================================
 
@@ -31,7 +32,7 @@
 ;; Ragtime interface
 
 (defrecord CassandraDatabase [hosts keyspace]
-  Migratable
+  DataStore
   (add-migration-id [db id]
     (with-connection hosts keyspace
       (fn [conn]
@@ -63,24 +64,23 @@
 ;; Joplin interface
 
 (defmethod migrate-db :cass [target & args]
-  (do-migrate (get-migrations (:migrator target)) (->CassDatabase target)))
+  (apply do-migrate (get-migrations (:migrator target))
+         (->CassDatabase target)
+         args))
 
-(defmethod rollback-db :cass [target & [n]]
-  (do-rollback (get-migrations (:migrator target))
-               (->CassDatabase target)
-               n))
+(defmethod rollback-db :cass [target amount-or-id & args]
+  (apply do-rollback (get-migrations (:migrator target))
+         (->CassDatabase target)
+         amount-or-id
+         args))
 
 (defmethod seed-db :cass [target & args]
-  (let [migrations (get-migrations (:migrator target))]
-    (do-seed-fn migrations (->CassDatabase target) target args)))
-
-(defmethod reset-db :cass [target & args]
-  (do-reset (get-migrations (:migrator target))
-            (->CassDatabase target) target args))
-
-(defmethod create-migration :cass [target & [id]]
-  (do-create-migration target id "joplin.cassandra.database"))
+  (apply do-seed-fn (get-migrations (:migrator target))
+         (->CassDatabase target) target args))
 
 (defmethod pending-migrations :cass [target & args]
   (do-pending-migrations (->CassDatabase target)
                          (get-migrations (:migrator target))))
+
+(defmethod create-migration :cass [target & [id]]
+  (do-create-migration target id "joplin.cassandra.database"))

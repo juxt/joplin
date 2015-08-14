@@ -1,0 +1,4 @@
+{:migrators    {:cass-mig "joplin/migrators/cass"}
+ :seeds        {:cass-seed "seeds.cass/run"}
+ :databases    {:cass-dev {:type :cass, :hosts [#env TARGET_HOST], :keyspace "test"}}
+ :environments {:dev [{:db :cass-dev, :migrator :cass-mig, :seed :cass-seed}]}}
