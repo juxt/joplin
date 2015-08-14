@@ -46,7 +46,7 @@ The first argument must be the name of the migration to create"
   [id]
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))
 
-(defn- load-var
+(defn load-var
   "Load a var specified by a string"
   [var-name]
   (try
@@ -169,8 +169,8 @@ or resource folders inside a jar on the classpath"
 
        seed-fn
        (do
-         (printf "Applying seed function %s\n" (:seed target))
-         (apply seed-fn target args))
+         (printf "Applying seed function %s\n" seed-fn)
+         (apply @seed-fn target args))
 
        :else
        (printf "Skipping %s\n" (:seed target))))))

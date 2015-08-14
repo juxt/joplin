@@ -1,8 +1,11 @@
 (ns migrate
   (:require [clojure.java.io :as io]
-            [joplin.repl :as repl]))
+            [joplin.repl :as repl]
+            [ragtime.strategy :as strategy]))
 
+;; check out resauce
 
+;; Cassandra
 (comment
 
   ;; Load the config file, joplins repl/load-config has support for env variables
@@ -12,6 +15,9 @@
   ;; Migrate cassandra
   (repl/migrate conf :dev)
 
+  ;; override conflict strategy
+  (repl/migrate conf :dev :cass-dev {:strategy strategy/rebase})
+
   ;; Rollback cassandra
   (repl/rollback conf :dev :cass-dev 1)
 
@@ -19,6 +25,23 @@
   (repl/seed conf :dev)
 
   ;; Reset cassandra
-  (repl/reset conf :dev)
+  (repl/reset conf :dev :cass-dev)
+
+  )
+
+;; Zookeeper
+(comment
+  (def conf (repl/load-config
+             (io/resource "joplin-zk.edn")))
+
+  ;; seed zk
+  (repl/seed conf :dev)
+  )
+
+;; SQL
+(comment
+
+  ;; override migration table name for sql
+
 
   )

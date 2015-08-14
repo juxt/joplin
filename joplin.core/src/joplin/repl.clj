@@ -1,8 +1,8 @@
 (ns joplin.repl
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [joplin.core :refer [migrate-db rollback-db reset-db seed-db
-                                 pending-migrations create-migration]])
+            [joplin.core :refer [migrate-db rollback-db seed-db pending-migrations
+                                 create-migration]])
   (:import [java.io PushbackReader]))
 
 (def ^:const libs
@@ -11,7 +11,8 @@
    :jdbc 'joplin.jdbc.database
    :sql  'joplin.jdbc.database
    :hive 'joplin.hive.database
-   :es   'joplin.elasticsearch.database})
+   :es   'joplin.elasticsearch.database
+   :zk   'joplin.zookeeper.database})
 
 (defn- require-joplin-ns
   "We need to require the namespaces to get the defmethod evaluated"
@@ -24,10 +25,6 @@
     (doseq [t types
             :when (contains? libs t)]
       (require (get libs t)))))
-
-(defn load-config [r]
-  (edn/read {:readers {'env (fn [x] (System/getenv (str x)))}}
-            (PushbackReader. (io/reader r))))
 
 (defn- get-targets
   "Get a seq of dbs filtered by optional target-db. Looks up and inlines :migrator and :seed information (these will be nil is non-existent)"
@@ -43,6 +40,10 @@
              seq)))
 
 (defn- run-op [f targets args] (doseq [t targets] (apply f t args)))
+
+(defn load-config [r]
+  (edn/read {:readers {'env (fn [x] (System/getenv (str x)))}}
+            (PushbackReader. (io/reader r))))
 
 (defn migrate [conf env & args]
   (require-joplin-ns conf)

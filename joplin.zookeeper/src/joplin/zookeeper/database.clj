@@ -1,6 +1,6 @@
 (ns joplin.zookeeper.database
-  (:use [joplin.core])
   (:require [curator.framework :refer [curator-framework]]
+            [joplin.core :refer :all]
             [joplin.zookeeper.exhibitor :refer [exhibitor-framework]]
             [zookeeper :as zk]))
 
@@ -96,13 +96,12 @@
 (defmethod seed-db :zk [target & args]
   (println "Seeding #joplin.zookeeper.database.ZK" (select-keys (:db target) [:host :port :client]))
   (when-let [seed-fn (and (:seed target) (load-var (:seed target)))]
-    (println "Applying seed function" (:seed target))
-    (apply seed-fn target args)))
-
-(defmethod reset-db :zk [target & args]
-  (apply seed-db target args))
+    (println "Applying seed function" seed-fn)
+    (apply @seed-fn target args)))
 
 ;; Dummy fns for migrations, doesn't really make sense for a k/v stores
 
 (defmethod migrate-db :zk [target & args])
 (defmethod rollback-db :zk [target & args])
+(defmethod pending-migrations :zk [target & args])
+(defmethod create-migration :zk [target & args])

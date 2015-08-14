@@ -9,5 +9,4 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/java.classpath "0.2.2"]
                  [clj-time "0.11.0"]
-                 [resauce "0.1.0"]
                  [ragtime/ragtime.core "0.5.1"]])
