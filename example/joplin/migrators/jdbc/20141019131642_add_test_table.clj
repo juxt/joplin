@@ -1,12 +1,11 @@
 (ns migrators.jdbc.20141019131642-add-test-table
-  (:use [clojure.java.jdbc :as jdbc]
-        [joplin.jdbc.database]))
+  (:require [clojure.java.jdbc :as jdbc]))
 
 (defn up [db]
-  (sql/execute! (:db-spec db)
-    (sql/create-table-ddl :test_table
-                          [:id "INT"])))
+  (jdbc/execute! (:db-spec db)
+    (jdbc/create-table-ddl "test_table"
+                           [:id "varchar(255)"])))
 
 (defn down [db]
-  (sql/execute! (:db-spec db)
-    (sql/drop-table-ddl :test_table)))
+  (jdbc/execute! (:db-spec db)
+    (jdbc/drop-table-ddl :test_table)))

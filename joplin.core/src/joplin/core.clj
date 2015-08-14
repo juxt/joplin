@@ -41,7 +41,7 @@ The first argument must be the name of the migration to create"
 ;; ==========================================================================
 ;; Helpers
 
-(defn- get-full-migrator-id
+(defn get-full-migrator-id
   "Get a string with current date and time prepended"
   [id]
   (str (f/unparse (f/formatter "YYYYMMddHHmmss") (t/now)) "-" id))

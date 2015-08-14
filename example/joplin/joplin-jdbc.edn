@@ -1,19 +1,19 @@
-{:migrators {:sql-mig          "joplin/migrators/sql"
-             :sql-mig-extra    "joplin/migrators/sql/extrapath"
-             :imported-sql-mig "resources/imported-migrators/sql"
-             :jdbc-mig         "joplin/migrators/jdbc"
-             :jdbc-mig-extra   "joplin/migrators/jdbc/extrapath"}
+{:migrators {:sql-mig           "joplin/migrators/sql"
+             :sql-mig-extra     "joplin/migrators/sql/extrapath"
+             :jdbc-mig-import   "resources/imported-migrators/jdbc"
+             :jdbc-mig          "joplin/migrators/jdbc"
+             :jdbc-mig-extra    "joplin/migrators/jdbc/extrapath"}
  :seeds     {:sql-seed          "seeds.sql/run"
-             :imported-sql-seed "imported-seeds.sql/run"}
- :databases {:sql-dev        {:type :sql, :url "jdbc:h2:file:dev"}
-             :sql-dev-extra  {:type :sql, :migrations-table "ragtime_migrations_extra", :url "jdbc:h2:file:dev"}
-             :jdbc-dev       {:type :jdbc, :url "jdbc:h2:file:./analysis"}
-             :jdbc-dev-extra {:type :jdbc, :migration-table "ragtime_migrations_extra", :url "jdbc:h2:file:analysis"}
+             :seed-import       "imported-seeds.sql/run"}
+ :databases {:sql-dev        {:type :sql, :url "jdbc:h2:file:./h2/dev"}
+             :sql-dev-extra  {:type :sql, :migrations-table "ragtime_migrations_extra", :url "jdbc:h2:file:./h2/dev"}
+             :jdbc-dev       {:type :jdbc, :url "jdbc:h2:file:./h2/analysis"}
+             :jdbc-import    {:type :jdbc, :migration-table "migrations", :url "jdbc:h2:file:./h2/web"}
              :psql-dev       {:type :sql, :host #env TARGET_HOST :urlf "jdbc:postgresql://%s/test?user=postgres&password=password"}
              :psql-prod      {:type :sql, :url "jdbc:postgresql://psq-prod/prod?user=prod&password=secret"}}
- :environments {:dev  [{:db :sql-dev, :migrator :imported-sql-mig, :seed :imported-sql-seed}
-                       {:db :sql-dev-extra, :migrator :sql-mig-extra}
+ :environments {:dev  [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}
+                       {:db :sql-dev-extra, :migrator :sql-mig-extra, :seed :sql-seed}
                        {:db :jdbc-dev, :migrator :jdbc-mig, :seed :sql-seed}
-                       {:db :jdbc-dev-extra, :migrator :jdbc-mig-extra, :seed :sql-seed}
+                       {:db :jdbc-import, :migrator :jdbc-mig-import, :seed :seed-import}
                        {:db :psql-dev, :migrator :sql-mig, :seed :sql-seed}]
                 :prod [{:db :sql-prod, :migrator :imported-sql-mig, :seed :imported-sql-seed}]}}

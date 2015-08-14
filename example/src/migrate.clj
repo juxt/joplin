@@ -3,7 +3,7 @@
             [joplin.repl :as repl]
             [ragtime.strategy :as strategy]))
 
-;; check out resauce
+(println "Welcome to ")
 
 (defn- url [m]
   (assoc m :url (format (:urlf m) (:host m))))
@@ -16,6 +16,7 @@
                 (update-in [:databases :psql-dev] url)))
 
   (repl/migrate conf :dev :jdbc-dev)
+  (repl/reset conf :dev :sql-dev-extra)
 
 
   )

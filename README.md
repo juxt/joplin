@@ -5,6 +5,8 @@ rollback-db multimethod takes one more arg
 create-migration multimethod tags one more arg
 ragtime 0.5 protocol changes
 no more joplin.lein
+sql migrations can now be specified in edn or sql format,
+- if sql format, you need to include line breaks
 - See example for aliases and REPL usage
 no more joplin config in project.clj
 - pass it datastructures
