@@ -1,7 +1,7 @@
 (ns joplin.hive.database
   (:require [clojure.java.jdbc :as jdbc]
-            [joplin.core :as joplin]
-            [ragtime.core :refer [Migratable]]))
+            [joplin.core :refer :all]
+            [ragtime.protocols :refer [DataStore]]))
 
 ;; =============================================================
 
@@ -43,7 +43,7 @@
 ;; Ragtime interface
 
 (defrecord HiveDatabase [subname]
-  Migratable
+  DataStore
   (add-migration-id [db id]
     (let [spec (get-spec subname)]
       (add-migration spec id)))
@@ -62,29 +62,21 @@
 ;; ============================================================================
 ;; Joplin interface
 
-(defmethod joplin/migrate-db :hive [target & args]
-  (joplin/do-migrate
-   (joplin/get-migrations (:migrator target))
-   (->HiveDatabase target)))
+(defmethod migrate-db :hive [target & args]
+  (apply do-migrate (get-migrations (:migrator target))
+         (->HiveDatabase target) args))
 
-(defmethod joplin/rollback-db :hive [target & [n]]
-  (joplin/do-rollback
-   (joplin/get-migrations (:migrator target))
-   (->HiveDatabase target)
-   n))
+(defmethod rollback-db :hive [target amount-or-id & args]
+  (apply do-rollback (get-migrations (:migrator target))
+         (->HiveDatabase target) amount-or-id args))
 
-(defmethod joplin/seed-db :hive [target & args]
-  (let [migrations (joplin/get-migrations (:migrator target))]
-    (joplin/do-seed-fn migrations (->HiveDatabase target) target args)))
-
-(defmethod joplin/reset-db :hive [target & args]
-  (joplin/do-reset
-   (joplin/get-migrations (:migrator target))
-   (->HiveDatabase target) target args))
-
-(defmethod joplin/create-migration :hive [target & [id]]
-  (joplin/do-create-migration target id "joplin.hive.database"))
+(defmethod seed-db :hive [target & args]
+  (apply do-seed-fn (get-migrations (:migrator target))
+         (->HiveDatabase target) target args))
 
 (defmethod pending-migrations :hive [target & args]
   (do-pending-migrations (->HiveDatabase target)
                          (get-migrations (:migrator target))))
+
+(defmethod create-migration :hive [target id & args]
+  (do-create-migration target id "joplin.hive.database"))
