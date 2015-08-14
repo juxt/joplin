@@ -1,0 +1,6 @@
+{:migrators {}
+ :seeds     {:zk-seed "seeds.zk/run"}
+ :databases {:zk-dev  {:type :zk, :host #env TARGET_HOST, :port 2181, :client :curator}
+             :zk-prod {:type :zk, :host "zk-prod", :port 2181, :client :exhibitor}}
+ :environments {:dev  [{:db :zk-dev, :seed :zk-seed}]
+                :prod [{:db :zk-prod}]}}

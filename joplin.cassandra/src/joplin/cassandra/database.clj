@@ -70,9 +70,7 @@
 
 (defmethod rollback-db :cass [target amount-or-id & args]
   (apply do-rollback (get-migrations (:migrator target))
-         (->CassDatabase target)
-         amount-or-id
-         args))
+         (->CassDatabase target) amount-or-id args))
 
 (defmethod seed-db :cass [target & args]
   (apply do-seed-fn (get-migrations (:migrator target))

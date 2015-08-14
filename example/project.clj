@@ -2,7 +2,8 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [joplin.core "0.3.0"]
                  [joplin.cassandra "0.3.0"]
-                 [joplin.zookeeper "0.3.0"]]
+                 [joplin.zookeeper "0.3.0"]
+                 [joplin.elasticsearch "0.3.0"]]
 
   :resource-paths ["joplin"]
 

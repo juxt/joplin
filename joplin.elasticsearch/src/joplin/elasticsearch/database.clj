@@ -1,21 +1,18 @@
 (ns joplin.elasticsearch.database
-  (:use [joplin.core])
-  (:require [clojure.string]
-            [clj-time.format :as f]
-            [clj-time.core :as t]
-            [clojurewerkz.elastisch.rest :as es]
-            [clojurewerkz.elastisch.rest.admin :as admin]
-            [clojurewerkz.elastisch.rest.bulk :as bulk]
-            [clojurewerkz.elastisch.rest.document :as esd]
-            [clojurewerkz.elastisch.rest.index :as esi]
-
-            [clojurewerkz.elastisch.native :as esn]
-            [clojurewerkz.elastisch.native.document :as esnd]
-
+  (:require [clj-time
+             [core :as t]
+             [format :as f]]
             [clojure.walk :refer [stringify-keys]]
-            [ragtime.core :refer [Migratable]])
-  (:import [org.elasticsearch.action.admin.indices.settings.get GetSettingsRequest]
-           [org.elasticsearch.client Client]))
+            [clojurewerkz.elastisch
+             [native :as esn]
+             [rest :as es]]
+            [clojurewerkz.elastisch.native.document :as esnd]
+            [clojurewerkz.elastisch.rest
+             [bulk :as bulk]
+             [document :as esd]
+             [index :as esi]]
+            [joplin.core :refer :all]
+            [ragtime.protocols :refer [DataStore]]))
 
 ;; ============================================================================
 ;; Handle migration tracking
@@ -88,7 +85,7 @@
 
 (defn migrate-data-native
   ([es-client es-native-client old-index mapping-type new-index]
-     (migrate-data-native es-client old-index mapping-type new-index identity))
+     (migrate-data-native es-client es-native-client old-index mapping-type new-index identity))
   ([es-client es-native-client old-index mapping-type new-index trans-f]
      (dorun
       (->> (esnd/search es-native-client
@@ -251,7 +248,7 @@
 ;; Ragtime interface
 
 (defrecord ElasticSearchDatabase [host port index migration-index cluster native-port]
-  Migratable
+  DataStore
   (add-migration-id [db id]
     (es-add-migration-id (client db) (get-migration-index db) id))
   (remove-migration-id [db id]
@@ -266,24 +263,21 @@
 ;; Joplin interface
 
 (defmethod migrate-db :es [target & args]
-  (do-migrate (get-migrations (:migrator target)) (->ESDatabase target)))
+  (apply do-migrate (get-migrations (:migrator target))
+         (->ESDatabase target)
+         args))
 
-(defmethod rollback-db :es [target & [n]]
-  (do-rollback (get-migrations (:migrator target))
-               (->ESDatabase target)
-               n))
+(defmethod rollback-db :es [target amount-or-id & args]
+  (apply do-rollback (get-migrations (:migrator target))
+         (->ESDatabase target) amount-or-id args))
 
 (defmethod seed-db :es [target & args]
-  (let [migrations (get-migrations (:migrator target))]
-    (do-seed-fn migrations (->ESDatabase target) target args)))
-
-(defmethod reset-db :es [target & args]
-  (do-reset (get-migrations (:migrator target))
-            (->ESDatabase target) target args))
-
-(defmethod create-migration :es [target & [id]]
-  (do-create-migration target id "joplin.elasticsearch.database"))
+  (apply do-seed-fn (get-migrations (:migrator target))
+         (->ESDatabase target) target args))
 
 (defmethod pending-migrations :es [target & args]
   (do-pending-migrations (->ESDatabase target)
                          (get-migrations (:migrator target))))
+
+(defmethod create-migration :es [target & [id]]
+  (do-create-migration target id "joplin.elasticsearch.database"))

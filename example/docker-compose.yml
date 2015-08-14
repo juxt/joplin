@@ -1,18 +1,18 @@
-postgres:
-  build: postgres-docker
-  environment:
-    POSTGRES_PASSWORD: password
-  ports:
-    - "5432:5432"
+# postgres:
+#   build: postgres-docker
+#   environment:
+#     POSTGRES_PASSWORD: password
+#   ports:
+#     - "5432:5432"
 
 elasticsearch:
-  image: dockerfile/elasticsearch:latest
+  build: elasticsearch-docker
   ports:
     - "9200:9200"
     - "9300:9300"
 
 cassandra:
-  image: poklet/cassandra:latest
+  image: cassandra:latest
   ports:
     - "7000:7000"
     - "7001:7001"
@@ -32,12 +32,12 @@ zookeeper:
     - "2181:2181"
     - "8080:8080"
 
-datomic:
-  build: datomic-docker
-  ports:
-    - "4334:4334"
-    - "4335:4335"
-    - "4336:4336"
+# datomic:
+#   build: datomic-docker
+#   ports:
+#     - "4334:4334"
+#     - "4335:4335"
+#     - "4336:4336"
 
 # hive:
 #   image: inmobi/docker-hive:latest

@@ -5,6 +5,17 @@
 
 ;; check out resauce
 
+;; ES
+(comment
+  (def conf (repl/load-config
+             (io/resource "joplin-es.edn")))
+
+  (repl/migrate conf :dev)
+  (repl/seed conf :dev)
+  (repl/reset conf :dev :es-dev)
+
+  )
+
 ;; Cassandra
 (comment
 

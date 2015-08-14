@@ -1,0 +1,10 @@
+{:migrators {:es-mig      "joplin/migrators/es"
+             :es-data-mig "joplin/migrators/esdata"}
+ :seeds     {:es-seed     "seeds.es/run"}
+ :databases {:es-dev      {:type :es, :host #env TARGET_HOST, :port 9200}
+             :es-dev-data {:type :es, :host #env TARGET_HOST, :port 9200 :migration-index "migrations-data"}
+             :es-prod     {:type :es, :host "es-prod", :port 9200}}
+ :environments {:dev  [{:db :es-dev, :migrator :es-mig, :seed :es-seed}
+                       ;; the same as :es-dev, to enable multiple migration tables
+                       {:db :es-dev-data, :migrator :es-data-mig}]
+                :prod [{:db :es-prod, :migrator :es-mig, :seeds :es-seed}]}}
