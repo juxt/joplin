@@ -1,21 +1,6 @@
-# Differences
-
-reset-db multimethod is gone
-rollback-db multimethod takes one more arg
-create-migration multimethod tags one more arg
-ragtime 0.5 protocol changes
-no more joplin.lein
-sql migrations can now be specified in edn or sql format,
-- if sql format, you need to include line breaks
-- See example for aliases and REPL usage
-no more joplin config in project.clj
-- pass it datastructures
-- see examples for helper fns
-:migration-table -> :migrations-table
-Args are passed down to the core/do-* functions properly now
-New jdbc version with possible breaking changes
-
 # Joplin
+
+*Joplin 0.3.0 contains many breaking changes over the 0.2 releases*, please [see here for details](https://github.com/juxt/joplin/wiki/Differences-between-0.2-and-0.3).
 
 Joplin is a library for flexible datastore migration and seeding.
 

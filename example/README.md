@@ -12,11 +12,15 @@ Install [Docker](http://docker.io), [Docker Compose](https://docs.docker.com/com
 
 This will bring up all databases, please note that will require a fair amount of RAM in the docker machine. If it runs out consider editing the `fig.yml` file to only start the databases you care about.
 
-- `lein with-profile web-frontend joplin migrate dev`
-- `lein joplin migrate dev`
-- `lein joplin seed dev`
-- `lein with-profile analysis joplin migrate dev`
-- etc...
+The example contains a namespace that is convenient to use from the REPL, to `$ lein run` to enter that namespace.
+
+The `project.clj` also contains a number of alias making it possible to migrate databases from the command line.
+These alias map directly to the 5 core operations Joplin provides;
+* migrate
+* seed
+* rollback
+* pending
+* create
 
 For more information check out the joplin documentation.
 
