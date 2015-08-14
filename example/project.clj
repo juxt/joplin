@@ -1,13 +1,16 @@
 (defproject joplin-example "0.3.0"
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [joplin.core "0.3.0"]
-                 [joplin.cassandra "0.3.0"]
-                 [joplin.zookeeper "0.3.0"]
-                 [joplin.elasticsearch "0.3.0"]
-                 [joplin.datomic "0.3.0"]
-                 [joplin.hive "0.3.0"]]
+                 [joplin.jdbc "0.3.0"]
+                 [com.h2database/h2 "1.4.188"]
+                 ;; [joplin.cassandra "0.3.0"]
+                 ;; [joplin.zookeeper "0.3.0"]
+                 ;; [joplin.elasticsearch "0.3.0"]
+                 ;; [joplin.datomic "0.3.0"]
+                 ;; [joplin.hive "0.3.0"]
+                 ]
 
   :resource-paths ["joplin"]
 
-  :profiles {:h2   {:dependencies [[com.h2database/h2 "1.3.171"]]}
-             :psql {:dependencies [[postgresql/postgresql "9.3-1101.jdbc4"]]}})
+  :profiles {:h2   {:dependencies [[com.h2database/h2 "1.4.188"]]}
+             :psql {:dependencies [[org.postgresql/postgresql "9.4-1201-jdbc4"]]}})

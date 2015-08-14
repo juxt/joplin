@@ -1,3 +1,18 @@
+# Differences
+
+reset-db multimethod is gone
+rollback-db multimethod takes one more arg
+create-migration multimethod tags one more arg
+ragtime 0.5 protocol changes
+no more joplin.lein
+- See example for aliases and REPL usage
+no more joplin config in project.clj
+- pass it datastructures
+- see examples for helper fns
+:migration-table -> :migrations-table
+Args are passed down to the core/do-* functions properly now
+New jdbc version with possible breaking changes
+
 # Joplin
 
 Joplin is a library for flexible datastore migration and seeding.

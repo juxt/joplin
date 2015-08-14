@@ -1,9 +1,10 @@
-# postgres:
-#   build: postgres-docker
-#   environment:
-#     POSTGRES_PASSWORD: password
-#   ports:
-#     - "5432:5432"
+postgres:
+  build: postgres-docker
+  environment:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: password
+  ports:
+    - "5432:5432"
 
 elasticsearch:
   build: elasticsearch-docker

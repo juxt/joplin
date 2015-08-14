@@ -1,3 +1,3 @@
 FROM postgres:latest
 
-ADD create-test-table.sh /docker-entrypoint-initdb.d/
+ADD create-test-database.sql /docker-entrypoint-initdb.d/

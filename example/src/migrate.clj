@@ -5,13 +5,27 @@
 
 ;; check out resauce
 
+(defn- url [m]
+  (assoc m :url (format (:urlf m) (:host m))))
+
+;; SQL
+(comment
+
+  (def conf (-> (io/resource "joplin-jdbc.edn")
+                repl/load-config
+                (update-in [:databases :psql-dev] url)))
+
+  (repl/migrate conf :dev :jdbc-dev)
+
+
+  )
+
+
 ;; Datomic
 (comment
   (def conf (-> (io/resource "joplin-dt.edn")
                 repl/load-config
-                (update-in [:databases :dt-dev]
-                           (fn [m]
-                             (assoc m :url (format (:urlf m) (:host m)))))
+                (update-in [:databases :dt-dev] url)
                 (assoc-in [:databases :dt-dev :url] "datomic:mem://foo")))
   (repl/reset conf :dev)
 
@@ -65,12 +79,4 @@
 
   ;; seed zk
   (repl/seed conf :dev)
-  )
-
-;; SQL
-(comment
-
-  ;; override migration table name for sql
-
-
   )
