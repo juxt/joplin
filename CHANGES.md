@@ -1,3 +1,9 @@
+## 0.3.1
+
+### Minor changes
+
+Improved backwards compatability for :jdbc migrators
+
 ## 0.3.0
 
 Major rewrite with several breaking changes. [See here for details](https://github.com/juxt/joplin/wiki/Differences-between-0.2-and-0.3)
