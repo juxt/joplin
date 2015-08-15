@@ -1,17 +1,17 @@
 (ns joplin.jdbc.database
-  (:require [ragtime.jdbc :refer [map->SqlDatabase load-resources load-directory]]
-            [ragtime.protocols :refer [DataStore]]
-            [joplin.core :refer :all]))
-
-(defn- setup-dbspec [m]
-  (assoc m :db-spec {:connection-uri (:url m)}))
+  (:require [clojure.set :as set]
+            [joplin.core :refer :all]
+            [ragtime.jdbc :refer [map->SqlDatabase load-resources load-directory]]
+            [ragtime.protocols :refer [DataStore]]))
 
 (defn- append-uri [target]
-  (-> (merge {:migrations-table "ragtime_migrations"}
-             (:db target))
-      (select-keys [:url :datasource :migrations-table])
-      setup-dbspec
-      (merge target)))
+  (let [uri {:connection-uri (:url (:db target))}]
+    (-> (merge {:migrations-table "ragtime_migrations"}
+               (:db target))
+        (select-keys [:url :datasource :migrations-table])
+        (assoc :db-spec uri)
+        (merge uri)
+        (merge target))))
 
 (defn- get-sql-migrations [path]
   (or (seq (load-directory path))

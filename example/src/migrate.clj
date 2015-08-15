@@ -41,5 +41,3 @@
              (io/resource \"joplin-cass.edn\")))
 
 "))
-
-(def conf (repl/load-config (io/resource "joplin-dt.edn")))

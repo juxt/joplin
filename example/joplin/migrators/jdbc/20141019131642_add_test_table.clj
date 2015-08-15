@@ -1,11 +1,11 @@
 (ns migrators.jdbc.20141019131642-add-test-table
-  (:require [clojure.java.jdbc :as jdbc]))
+  (:use [clojure.java.jdbc.deprecated :as sql]))
 
 (defn up [db]
-  (jdbc/execute! (:db-spec db)
-    (jdbc/create-table-ddl "test_table"
-                           [:id "varchar(255)"])))
+  (sql/with-connection db
+    (sql/create-table :test_table
+                      [:id "INT"])))
 
 (defn down [db]
-  (jdbc/execute! (:db-spec db)
-    (jdbc/drop-table-ddl :test_table)))
+  (sql/with-connection db
+    (sql/drop-table :test_table)))

@@ -1,6 +1,6 @@
 # Joplin
 
-*Joplin 0.3.0 contains many breaking changes over the 0.2 releases*, please [see here for details](https://github.com/juxt/joplin/wiki/Differences-between-0.2-and-0.3).
+*Joplin 0.3 contains many breaking changes over the 0.2 releases*, please [see here for details](https://github.com/juxt/joplin/wiki/Differences-between-0.2-and-0.3).
 
 Joplin is a library for flexible datastore migration and seeding.
 
@@ -28,18 +28,18 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 Add joplin.core as a dependency if you just want the database-independent core:
 
 ```clojure
-:dependencies [[joplin.core "0.3.0"]]
+:dependencies [[joplin.core "0.3.1"]]
 ```
 
 If you are not using Leiningen, add a dependency for the plugins of the databases you want to migrate;
 
 ```clojure
-:dependencies [[joplin.cassandra "0.3.0"]
-               [joplin.datomic "0.3.0"]
-               [joplin.elasticsearch "0.3.0"]
-               [joplin.hive "0.3.0"]
-               [joplin.jdbc "0.3.0"]
-               [joplin.zookeeper "0.3.0"]]
+:dependencies [[joplin.cassandra "0.3.1"]
+               [joplin.datomic "0.3.1"]
+               [joplin.elasticsearch "0.3.1"]
+               [joplin.hive "0.3.1"]
+               [joplin.jdbc "0.3.1"]
+               [joplin.zookeeper "0.3.1"]]
 ```
 
 ## Using Joplin
@@ -182,7 +182,7 @@ For this type of migration, use the Joplin database type `:sql`.
 
 You may also specify your migrations as Clojure namespaces, like the example for Cassandra above, by using the Joplin database type `:jdbc`. See the [example project](https://github.com/juxt/joplin/tree/master/example) for details.
 
-Please note as of Joplin 0.3.0 if you have multiple SQL statements in a single `.sql` file, you need to insert a marker `--;;` between them.
+Please note as of Joplin 0.3 if you have multiple SQL statements in a single `.sql` file, you need to insert a marker `--;;` between them.
 
 ### Writing seed functions
 
