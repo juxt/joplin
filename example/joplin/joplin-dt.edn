@@ -1,4 +1,4 @@
 {:migrators {:dt-mig "joplin/migrators/datomic"}
  :seeds     {:dt-seed "seeds.dt/run"}
- :databases {:dt-dev {:type :dt, :host #env TARGET_HOST :urlf "datomic:free://%s:4334/test"}}
+ :databases {:dt-dev {:type :dt, :host #envf ["datomic:free://%s:4334/test" TARGET_HOST]}}
  :environments {:dev [{:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}]}}

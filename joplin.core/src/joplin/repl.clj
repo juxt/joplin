@@ -42,7 +42,10 @@
 (defn- run-op [f targets args] (doseq [t targets] (apply f t args)))
 
 (defn load-config [r]
-  (edn/read {:readers {'env (fn [x] (System/getenv (str x)))}}
+  (edn/read {:readers {'env (fn [x] (System/getenv (str x)))
+                       'envf (fn [[fmt & args]]
+                               (apply format fmt
+                                      (map #(System/getenv (str %)) args)))}}
             (PushbackReader. (io/reader r))))
 
 (defn migrate [conf env & args]

@@ -19,7 +19,7 @@
              :zk-seed           "seeds.zk/run"
              }
 
- :databases {:dt-dev         {:type :dt, :host #env TARGET_HOST :urlf "datomic:free://%s:4334/test"}
+ :databases {:dt-dev         {:type :dt, :host #envf ["datomic:free://%s:4334/test" TARGET_HOST]}
              :sql-dev        {:type :sql, :url "jdbc:h2:file:./h2/dev"}
              :sql-dev-extra  {:type :sql, :migrations-table "ragtime_migrations_extra", :url "jdbc:h2:file:./h2/dev"}
 
@@ -32,8 +32,8 @@
              :es-dev         {:type :es, :host #env TARGET_HOST, :port 9200}
              :es-dev-data    {:type :es, :host #env TARGET_HOST, :port 9200 :migration-index "migrations-data"}
              :es-prod        {:type :es, :host "es-prod", :port 9200}
-             :psql-dev       {:type :sql, :host #env TARGET_HOST :urlf "jdbc:postgresql://%s/test?user=postgres&password=password"}
-             :psql-prod      {:type :sql, :url "jdbc:postgresql://psq-prod/prod?user=prod&password=secret"}
+             :psql-dev       {:type :sql, :url #envf ["jdbc:postgresql://%s/test?user=postgres&password=password" TARGET_HOST]}
+             :psql-prod      {:type :sql, :url #envf ["jdbc:postgresql://psq-prod/prod?user=%s&password=%s" PROD_USER PROD_PASSWD]}
 
              :hive-dev       {:type :hive, :host #env TARGET_HOST, :subnamef "//%s:10000/default"}
              }

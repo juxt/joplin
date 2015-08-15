@@ -6,7 +6,7 @@ Joplin is a library for flexible datastore migration and seeding.
 
 Joplin tries to solve the problems that arise when dealing with complicated systems consisting of multiple datastores. It lets you define and reason about environments (for instance dev, staging, UAT, prod).
 
-Joplin lets you declare your `databases`, `migrators`, `seed functions` up front and combine them into different `environments`. It can be used via a [leiningen](http://leiningen.org) plugin or be called programatically.
+Joplin lets you declare your `databases`, `migrators`, `seed functions` up front and combine them into different `environments`. It can be used from the REPL, via a [leiningen](http://leiningen.org) aliases or be called programatically.
 
 Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch, Cassandra, Hive and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
 
@@ -28,96 +28,110 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 Add joplin.core as a dependency if you just want the database-independent core:
 
 ```clojure
-:dependencies [[joplin.core "0.2.15"]]
+:dependencies [[joplin.core "0.3.0"]]
 ```
 
-If you want to integrate Joplin into Leiningen:
+If you are not using Leiningen, add a dependency for the plugins of the databases you want to migrate;
 
 ```clojure
-:plugins [[joplin.lein "0.2.15"]]
+:dependencies [[joplin.cassandra "0.3.0"]
+               [joplin.datomic "0.3.0"]
+               [joplin.elasticsearch "0.3.0"]
+               [joplin.hive "0.3.0"]
+               [joplin.jdbc "0.3.0"]
+               [joplin.zookeeper "0.3.0"]]
 ```
 
-`joplin.lein` will add dependencies to your project only for the plugins that you are using, i.e. the type of the databases you have defined.
+## Using Joplin
 
-If you are not using Leiningen, add a depedency (only) for the plugins of the databases you want to migrate;
+### Defining the configuration map
 
-```clojure
-:dependencies [[joplin.cassandra "0.2.15"]
-               [joplin.datomic "0.2.15"]
-               [joplin.elasticsearch "0.2.15"]
-               [joplin.hive "0.2.15"]
-               [joplin.jdbc "0.2.15"]
-               [joplin.zookeeper "0.2.15"]]
-```
+The joplin configuration map contains the keys `:databases`, `:migrators`, `:seeds` and `:environments`. The first three are pure declarations and `:environments` is where these declarations gets combined. For more details on these 4 keys see the [Concepts wiki page](https://github.com/juxt/joplin/wiki/concepts).
 
-## Usage
-
-### Using Joplin with Leiningen
-
-To use `joplin.lein` you need to define a key called `:joplin` in your `project.clj`. See the [example project](https://github.com/juxt/joplin/blob/master/example/project.clj#L8).
-
-The value of this key must be a map containing the keys `:databases`, `:migrators`, `:seeds` and `:environments`. The first three are pure declarations and `:environments` is where these declarations gets combined. For more details on these 4 keys see the [Concepts wiki page](https://github.com/juxt/joplin/wiki/concepts).
+Typically you would define the configuration in a `.edn` file that you put somewhere on your classpath.
 
 Please note that the folders with migrators and seed-var namespaces needs to be in the classpath in order for joplin to access them. Joplin will also look into any jar files on the classpath for resource folders with matching name.
 
 Example of a joplin definition;
 ```clojure
-:joplin {
-         :migrators {:sql-mig "joplin/migrators/sql"}  ;; A path for a folder with migration files
+{
+:migrators {:sql-mig "joplin/migrators/sql"}  ;; A path for a folder with migration files
 
-         :seeds {:sql-seed "seeds.sql/run"             ;; A clojure var (function) that applies the seed
-                 :es-seed "seeds.es/run"}
+:seeds {:sql-seed "seeds.sql/run"             ;; A clojure var (function) that applies the seed
+        :es-seed "seeds.es/run"}
 
-         :databases {:sql-dev {:type :jdbc, :url "jdbc:h2:mem:dev"}
-                     :es-prod {:type :es, :host "es-prod.local", :port "9300", :cluster "dev"}
-                     :sql-prod {:type :jdbc, :url "jdbc:h2:file:prod"}}
+:databases {:sql-dev {:type :jdbc, :url "jdbc:h2:mem:dev"}
+            :es-prod {:type :es, :host "es-prod.local", :port "9300", :cluster "dev"}
+            :sql-prod {:type :jdbc, :url "jdbc:h2:file:prod"}}
 
-         ;; We combine the definitions above into different environments
-         :environments {:dev [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}]
-                        :prod [{:db :sql-prod, :migrator :sql-mig}
-                               {:db :es-prod}, :seed :es-seed]}
-        }
+;; We combine the definitions above into different environments
+:environments {:dev [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}]
+               :prod [{:db :sql-prod, :migrator :sql-mig}
+                      {:db :es-prod}, :seed :es-seed]}
+}
 ```
 
-Once the `:joplin` map has been defined, you can use the joplin leiningen plugin. The plugin comes with 5 commands;
+### Hiding secrets from the configuration map
 
-All commands take the name of the environment as their first argument.
+Once the config map has been written to a `.edn` file you'll need to read that file and pass the datastructure to joplin's migration and seed functions. JDBC connection string typically include username and password that you don't want to put into source control.
 
-- `lein joplin migrate ENV [DB]`
+The `joplin.repl` namespace provides a function called `load-config` that take the name (or URL) of a file on the classpath (`joplin.edn`) and reads the contents turning it into Clojure datastructures. This function implements 2 tagged literals to solves the problem with secrets in the configuration; `env` and `envf`
+```clojure
+             :cass-dev       {:type :cass, :hosts [#env TARGET_HOST], :keyspace "test"}
+             :psql-prod      {:type :sql, :url #envf ["jdbc:postgresql://psq-prod/prod?user=%s&password=%s" PROD_USER PROD_PASSWD]}
 
-Run all pending (up) migrations on either all databases in the environment or a single if the DB param is provided. This operation is idempotent.
+```
 
-- `lein joplin seed ENV [DB]`
+* `env` tags a single name of an environment variable that is put in its place in the result of the `load-config` call.
+* `envf` takes a vector of data, the first item is a string passed to Clojure's `format` function. The rest of the items in the vector are names of environment variables that will be looked up and pass along to the `format` call.
 
-Run the seed functions on either all databases in the environment or a single if the DB param is provided. This operation is NOT idempotent, running seed functions multiple time can lead to duplication of data.
+### Running migrations
+
+The `joplin.repl` namespace defines a function for each of Joplin's 5 basic operations.
+
+- `migrate [conf env & args]`
+
+Run all pending (up) migrations on either all databases in the environment or a single if the database is provided as the first argument after env. This operation is idempotent.
+
+- `seed [conf env & args]`
+
+Run the seed functions on either all databases in the environment or a single if the database is provided as the first argument after env. This operation is NOT idempotent, running seed functions multiple time can lead to duplication of data.
 
 Joplin will only run seed functions on databases that have been fully migrated, i.e. have no pending migrations.
 
-- `lein joplin rollback ENV DB [N]`
+- `rollback [conf env database amount-or-id & args]`
 
-Rollback N migrations (down migrate) from a single database in an environment. N is an optional argument and defaults to 1. This command requires that you specify a db.
+Rollback N migrations (down migrate) from a single database in an environment. N can either be a number (the number to migration steps you want to roll back, or an id of a migration you want to roll back to). This command requires that you specify a db.
 
-- `lein joplin reset ENV DB`
+- `reset [conf env database & args]`
 
 Rollback ALL migrations, apply ALL up migrations and call the seed function for a single database in an environment. Intended to reset a database to a good state. This command require that you specify a db.
 
 Note that reset will only work properly if all down migrations do a complete cleanup of the action taken by the up migration.
 
-- `lein joplin create ENV DB ID`
-
-Create a new migration scaffold file for a single database in an environment. This command requires that you specify both a database and identification string of the migrations.
-
-- `lein joplin pending ENV DB`
+- `pending [conf env database & args]`
 
 Print pending migrations for a database in an environment.
 
+- `create [conf env database & args]`
+
+Create a new migration scaffold file for a single database in an environment. This command requires that you specify both a database and identification string of the migrations.
+
+#### Migration conflict strategies
+
+The extra args of the `joplin.repl` functions are used to pass extra options to ragtime, this is currently used for the `migrate` operation where different strategies for dealing with migration conflicts can be specified.
+
+`(migrate config :dev :cass-dev {:strategy ragtime.strategy/rebase})`
+
+[Read here](https://github.com/weavejester/ragtime/blob/master/ragtime.core/src/ragtime/strategy.clj#L24) for info on available strategies.
+
 ### Writing migrators
 
-Joplin migrators defaults to be 'code driven'. They are basic Clojure files and allows the migrators to be as simple or complicated as needed. If you are working with a SQL database, there is a second flavour of migrators at your disposal; ragtime-style sql migrators.
+Joplin migrators defaults to be 'code driven'. They are basic Clojure files and allows the migrators to be as simple or complicated as needed. If you are working with a SQL database, there is a second flavor of migrators at your disposal; ragtime-style sql migrators.
 
 #### Joplin default migrators
 
-A migrator consist of a single clojure source file. This file must contain (at least) 2 function definitions, one called `up` and one called `down`. The migrators will be called with one argument, which is the Ragtime Migratable record created by the joplin plugin. These record will contain the information you need to make a connections to the database and inflict a change.
+A migrator consist of a single clojure source file. This file must contain (at least) 2 function definitions, one called `up` and one called `down`. The migrators will be called with one argument, which is the Ragtime DataStore record created by the joplin plugin. These record will contain the information you need to make a connections to the database and inflict a change.
 
 Example of migrator;
 
@@ -146,7 +160,7 @@ Read the `project.clj` file for the corresponding joplin plugin to see what cloj
 
 #### SQL migrators
 
-When migrating SQL databases you have 2 flavours of migrators at your disposal. You may specify your migrations with two text files (one up, one down) as shown below:
+When migrating SQL databases you have 2 flavors of migrators at your disposal. You may specify your migrations with two text files (one up, one down) as shown below:
 
 ```
 $ ls -1 migrators/sql
@@ -159,6 +173,8 @@ CREATE TABLE test_table (id INT);
 For this type of migration, use the Joplin database type `:sql`.
 
 You may also specify your migrations as Clojure namespaces, like the example for Cassandra above, by using the Joplin database type `:jdbc`. See the example project for details.
+
+Please note as of Joplin 0.3.0 if you have multiple SQL statements in a single `.sql` file, you need to insert a marker `--;;` between them.
 
 ### Writing seed functions
 
@@ -181,7 +197,7 @@ The target map will consist of 3 keys; `:db, :migrator, :seed`. The contents of 
 
 ### Calling Joplin from your code
 
-Calling joplin from your code requires that you have loaded the `joplin.core` namespace and also the namespaces of the database plugins you intend to use. Then you can call one of 5 multi-methods to perform the same 5 actions as described above in the leiningen plugin section. The multi-methods are; `joplin.core/migrate-db`, `joplin.core/rollback-db`, `joplin.core/seed-db`, `joplin.core/reset-db`, `joplin.core/create-migration`.
+Calling joplin from your code requires that you have loaded the `joplin.core` namespace and also the namespaces of the database plugins you intend to use. Then you can call one of 5 multi-methods to perform the same 5 actions as described above in the leiningen plugin section. The multi-methods are; `joplin.core/migrate-db`, `joplin.core/rollback-db`, `joplin.core/seed-db`, `joplin.core/pending-migrations`, `joplin.core/create-migration`.
 
 All the multi-methods takes a `target` map as its first argument and additional optional arguments.
 
@@ -253,7 +269,7 @@ Joplin uses the [lein-sub](https://github.com/kumarshantanu/lein-sub) plugin, th
 
 ## License
 
-Copyright © 2014 Martin Trojer
+Copyright © 2015 Martin Trojer
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
