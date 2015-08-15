@@ -73,21 +73,25 @@ Example of a joplin definition;
 
 ### Hiding secrets from the configuration map
 
-Once the config map has been written to a `.edn` file you'll need to read that file and pass the datastructure to joplin's migration and seed functions. JDBC connection string typically include username and password that you don't want to put into source control.
+Once the config map has been written to a `.edn` file you'll need to read that file and pass the datastructure to joplin's migration and seed functions. JDBC connection strings typically include username and password that you don't want to put into source control.
 
-The `joplin.repl` namespace provides a function called `load-config` that take the name (or URL) of a file on the classpath (`joplin.edn`) and reads the contents turning it into Clojure datastructures. This function implements 2 tagged literals to solves the problem with secrets in the configuration; `env` and `envf`
+The `joplin.repl` namespace provides a function called `load-config` that take the name (or URL) of a file on the classpath (`joplin.edn`) and reads the contents turning it into Clojure datastructures. This function implements 2 tagged literals to solve the problem with secrets in the configuration; `env` and `envf`
 ```clojure
-             :cass-dev       {:type :cass, :hosts [#env TARGET_HOST], :keyspace "test"}
-             :psql-prod      {:type :sql, :url #envf ["jdbc:postgresql://psq-prod/prod?user=%s&password=%s" PROD_USER PROD_PASSWD]}
-
+:es-dev      {:type :es, :host #env TARGET_HOST, :port 9200}
+:psql-prod   {:type :sql, :url #envf ["jdbc:postgresql://psq-prod/prod?user=%s&password=%s"
+                                      PROD_USER PROD_PASSWD]}
 ```
 
-* `env` tags a single name of an environment variable that is put in its place in the result of the `load-config` call.
-* `envf` takes a vector of data, the first item is a string passed to Clojure's `format` function. The rest of the items in the vector are names of environment variables that will be looked up and pass along to the `format` call.
+* `env` takes a single name of an environment variable that is put in its place in the result of the `load-config` call.
+* `envf` takes a vector of data, the first item is a string passed to Clojure's `format` function. The rest of the items in the vector are names of environment variables that will be looked up and passed along with the format string to the `format` call.
+
+#### Overriding the migration table
+
+For `jdbc` / `sql` migrators the migration table is called `ragtime_migrations` by default. You can change this by adding a key called `:migrations-table` to the database map.
 
 ### Running migrations
 
-The `joplin.repl` namespace defines a function for each of Joplin's 5 basic operations.
+The `joplin.repl` namespace defines a function for each of Joplin's 5 basic operations. It's common to use these functions to setup a 'migration and seed REPL' from which you can control your databases.
 
 - `migrate [conf env & args]`
 
@@ -116,6 +120,10 @@ Print pending migrations for a database in an environment.
 - `create [conf env database & args]`
 
 Create a new migration scaffold file for a single database in an environment. This command requires that you specify both a database and identification string of the migrations.
+
+### Running migrations from the command line
+
+When you want to script your migrations requiring a REPL is not convenient. In this case you can use Leiningen aliases to provide command-line commands for the 5 operation above. The example project shows to do do this in the [project.clj](https://github.com/juxt/joplin/blob/master/example/project.clj#L14) and the [code the aliases uses](https://github.com/juxt/joplin/blob/master/example/src/alias.clj#L25).
 
 #### Migration conflict strategies
 
@@ -172,7 +180,7 @@ CREATE TABLE test_table (id INT);
 
 For this type of migration, use the Joplin database type `:sql`.
 
-You may also specify your migrations as Clojure namespaces, like the example for Cassandra above, by using the Joplin database type `:jdbc`. See the example project for details.
+You may also specify your migrations as Clojure namespaces, like the example for Cassandra above, by using the Joplin database type `:jdbc`. See the [example project](https://github.com/juxt/joplin/tree/master/example) for details.
 
 Please note as of Joplin 0.3.0 if you have multiple SQL statements in a single `.sql` file, you need to insert a marker `--;;` between them.
 

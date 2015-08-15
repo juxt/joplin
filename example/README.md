@@ -12,9 +12,9 @@ Install [Docker](http://docker.io), [Docker Compose](https://docs.docker.com/com
 
 This will bring up all databases, please note that will require a fair amount of RAM in the docker machine. If it runs out consider editing the `fig.yml` file to only start the databases you care about.
 
-The example contains a namespace that is convenient to use from the REPL, to `$ lein run` to enter that namespace.
+The example contains a [migrate namespace](https://github.com/juxt/joplin/blob/master/example/src/migrate.clj) that is convenient to use from the REPL, to `$ lein run` to enter that namespace.
 
-The `project.clj` also contains a number of alias making it possible to migrate databases from the command line.
+The `project.clj` also contains a number of [aliases](https://github.com/juxt/joplin/blob/master/example/project.clj#L14) making it possible to migrate databases from the command line.
 These alias map directly to the 5 core operations Joplin provides;
 * migrate
 * seed
