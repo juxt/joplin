@@ -11,13 +11,8 @@
 (defn load-config [path]
   (-> (io/resource path)
       repl/load-config
-      (update-in [:databases :psql-dev] url)
-      (update-in [:databases :dt-dev] url)
-      (update-in [:databases :hive-dev] (partial url :subnamef :subname))
-
       ;; to test mem db
-      (assoc-in [:databases :dt-dev :url] "datomic:mem://foo")
-      ))
+      (assoc-in [:databases :dt-dev :url] "datomic:mem://foo")))
 
 ;; -------------------------------------------------------------------
 ;; lein aliases
