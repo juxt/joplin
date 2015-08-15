@@ -52,9 +52,17 @@ The first argument must be the name of the migration to create"
   (try
     (let [var-sym (symbol var-name)]
       (require (-> var-sym namespace symbol))
-      (find-var var-sym))
+      (if-let [res (find-var var-sym)]
+        res
+        (throw (Exception.))))
     (catch Exception e
-      (printf "Function '%s' not found. %s\n" var-name (.getMessage e)))))
+      (printf "Function '%s' not found\n" var-name))))
+
+(defn get-fn [var]
+  "Resolves a var"
+  (if (and var (bound? var))
+    (deref var)
+    (printf "Var '%s' couldn't be de-reffed, probably a compiler error\n" var)))
 
 (defn- get-files
   "Get migrations files given a folder path.
@@ -121,8 +129,8 @@ or resource folders inside a jar on the classpath"
       (do
         (require ns)
         (map->JoplinMigration {:id   id
-                               :up   @(load-var (str ns "/up"))
-                               :down @(load-var (str ns "/down"))})))))
+                               :up   (get-fn (load-var (str ns "/up")))
+                               :down (get-fn (load-var (str ns "/down")))})))))
 
 
 (def split-at-conflict @#'ragtime.strategy/split-at-conflict)
@@ -158,7 +166,7 @@ or resource folders inside a jar on the classpath"
   "Run a seeder function with migration check"
   [migrations db target & args]
   (println "Seeding" db)
-  (when-let [seed-fn (and (:seed target) (load-var (:seed target)))]
+  (when-let [seed-fn (and (:seed target) (get-fn (load-var (:seed target))))]
     (let [pending-migrations (get-pending-migrations db migrations)]
 
       (cond
@@ -170,7 +178,7 @@ or resource folders inside a jar on the classpath"
        seed-fn
        (do
          (printf "Applying seed function %s\n" seed-fn)
-         (apply @seed-fn target args))
+         (apply seed-fn target args))
 
        :else
        (printf "Skipping %s\n" (:seed target))))))

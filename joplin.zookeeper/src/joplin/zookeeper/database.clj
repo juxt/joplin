@@ -95,9 +95,9 @@
 
 (defmethod seed-db :zk [target & args]
   (println "Seeding #joplin.zookeeper.database.ZK" (select-keys (:db target) [:host :port :client]))
-  (when-let [seed-fn (and (:seed target) (load-var (:seed target)))]
+  (when-let [seed-fn (and (:seed target) (get-fn (load-var (:seed target))))]
     (println "Applying seed function" seed-fn)
-    (apply @seed-fn target args)))
+    (apply seed-fn target args)))
 
 ;; Dummy fns for migrations, doesn't really make sense for a k/v stores
 
