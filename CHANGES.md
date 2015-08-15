@@ -2,6 +2,12 @@
 
 ### Minor changes
 
+Better error reporting when loading vars
+
+## 0.3.1
+
+### Minor changes
+
 Improved backwards compatability for :jdbc migrators
 
 ## 0.3.0
