@@ -25,16 +25,16 @@
   (rollback config :dev :cass-dev 1)
 
   ;; Seed (can also be called without the last database argument)
-  (repl/seed config :dev :cass-dev)
+  (seed config :dev :cass-dev)
 
   ;; Reset
-  (repl/reset config :dev :cass-dev)
+  (reset config :dev :cass-dev)
 
   ;; Create migration
-  (repl/create config :dev :cass-dev \"foo\")
+  (create config :dev :cass-dev \"foo\")
 
   ;; See pending migrations
-  (repl/pending config :dev :cass-dev)
+  (pending config :dev :cass-dev)
 
   ;; Load a config file, joplins repl/load-config has support for env variables
   (def conf (repl/load-config
