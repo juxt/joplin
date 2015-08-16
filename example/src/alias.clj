@@ -2,12 +2,6 @@
   (:require [clojure.java.io :as io]
             [joplin.repl :as repl]))
 
-(defn- url
-  ([m]
-   (url :urlf :url m))
-  ([skey tkey m]
-   (assoc m tkey (format (skey m) (:host m)))))
-
 (defn load-config [path]
   (-> (io/resource path)
       repl/load-config
