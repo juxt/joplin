@@ -1,5 +1,6 @@
 (ns leiningen.joplin
   (:require [leinjacker.deps :as deps])
+  (:require [leiningen.core.main :refer [leiningen-version]])
   (:use [leiningen.run :only (run)]))
 
 (def version "0.2.15")
@@ -53,8 +54,10 @@
         databases    (-> project :joplin :databases)
         migrators    (-> project :joplin :migrators)
         seeds        (-> project :joplin :seeds)
-        project      (add-joplin-deps project)]
+        project      (add-joplin-deps project)
+        prefix       (when (re-find #"^2.5.2-" (leiningen-version)) "--quote-args")]
     (apply run project
+           prefix
            "-m" "joplin.main"
            "-r" (get-require-string (get-db-types project))
            "-e" environments
