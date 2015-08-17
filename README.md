@@ -20,7 +20,6 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 * joplin.elasticsearch - migrate and seed [Elasticsearch](http://elasticsearch.org) clusters
 * joplin.hive - migrate and seed [Hive](https://hive.apache.org) tables using Avro
 * joplin.jdbc - migrate and seed SQL databases with jdbc
-* joplin.lein - a leiningen plugin run migrations and seeds
 * joplin.zookeeper - seed [Zookeeper](http://zookeeper.apache.org) clusters
 
 ## Installation
