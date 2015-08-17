@@ -1,4 +1,4 @@
-(defproject joplin.jdbc "0.2.16"
+(defproject joplin.jdbc "0.2.17"
   :description "JDBC support for Joplin"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
@@ -6,5 +6,5 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [joplin.core "0.2.16"]
+                 [joplin.core "0.2.17"]
                  [ragtime/ragtime "0.3.8"]])
