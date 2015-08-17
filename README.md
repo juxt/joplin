@@ -169,7 +169,7 @@ Read the `project.clj` file for the corresponding joplin plugin to see what cloj
 
 When migrating SQL databases you have 2 flavors of migrators at your disposal. You may specify your migrations with two text files (one up, one down) as shown below:
 
-```
+```shell
 $ ls -1 migrators/sql
 20120903221323-add-test-table.down.sql
 20120903221323-add-test-table.up.sql
@@ -209,7 +209,7 @@ Calling joplin from your code requires that you have loaded the `joplin.core` na
 All the multi-methods takes a `target` map as its first argument and additional optional arguments.
 
 The target map must have this shape;
-```
+```clojure
 {:db {:type DB-TYPE, DB-SETTING1: "foo", :DB-SETTING2: "bar", ...}
  :migrator "path to a folder on the classpath"
  :seed "name of a var in a namespace on the classpath"
@@ -219,7 +219,7 @@ The target map must have this shape;
 The `:migrator` and/or `:seed` keys are optional (joplin can't do much if both are missing). The `:DB-SETTING` keys vary for the different database types.
 
 For example;
-```
+```clojure
 (ns example
   (:require [joplin.core :as joplin]
             [joplin.dt.database]))
