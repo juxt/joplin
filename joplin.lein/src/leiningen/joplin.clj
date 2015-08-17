@@ -55,13 +55,15 @@
         migrators    (-> project :joplin :migrators)
         seeds        (-> project :joplin :seeds)
         project      (add-joplin-deps project)
-        prefix       (when (re-find #"^2.5.2-" (leiningen-version)) "--quote-args")]
-    (apply run project
-           prefix
-           "-m" "joplin.main"
-           "-r" (get-require-string (get-db-types project))
-           "-e" environments
-           "-d" databases
-           "-m" migrators
-           "-s" seeds
-           command args)))
+        run-args     (concat
+                       (when (re-find #"^2.5.2" (leiningen-version))
+                         ["--quote-args"])
+                       ["-m" "joplin.main"
+                        "-r" (get-require-string (get-db-types project))
+                        "-e" environments
+                        "-d" databases
+                        "-m" migrators
+                        "-s" seeds
+                        command]
+                       args)]
+    (apply run project run-args)))
