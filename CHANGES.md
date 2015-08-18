@@ -1,3 +1,9 @@
+## 0.3.3
+
+### Minor changes
+
+Fix issue #74 (minor differences between how joplin / ragtime scans the classpath)
+
 ## 0.3.2
 
 ### Minor changes
