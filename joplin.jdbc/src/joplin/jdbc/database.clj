@@ -15,7 +15,8 @@
 
 (defn- get-sql-migrations [path]
   (or (seq (load-directory path))
-      (seq (load-resources path))))
+      (seq (load-resources path))
+      (seq (load-resources (drop-first-part path "/")))))
 
 ;; ============================================================================
 ;; SQL driven sql migrations, ragtime style

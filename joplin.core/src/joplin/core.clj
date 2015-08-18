@@ -64,19 +64,24 @@ The first argument must be the name of the migration to create"
     (deref var)
     (printf "Var '%s' couldn't be de-reffed, probably a compiler error\n" var)))
 
+(defn drop-first-part [path delimiter]
+  (->> (string/split path #"/")
+       rest
+       (interpose delimiter)
+       (apply str)))
+
 (defn- get-files
   "Get migrations files given a folder path.
 Will try to locate files on the local filesystem, folder on the classpath
 or resource folders inside a jar on the classpath"
   [path]
-  (let [local-folder (io/file path)
-        classpath-folder-name (->> (string/split path #"/")
-                                   rest (interpose "/") (apply str))
-        folder-on-classpath (->> (classpath/classpath-directories)
-                                 (map #(str (.getPath %) "/" classpath-folder-name))
-                                 (map io/file)
-                                 (filter #(.isDirectory %))
-                                 first)]
+  (let [local-folder          (io/file path)
+        classpath-folder-name (drop-first-part path "/")
+        folder-on-classpath   (->> (classpath/classpath-directories)
+                                   (map #(str (.getPath %) "/" classpath-folder-name))
+                                   (map io/file)
+                                   (filter #(.isDirectory %))
+                                   first)]
 
     (cond
      ;; If it's a local folder just read the file from there
@@ -100,10 +105,7 @@ or resource folders inside a jar on the classpath"
   "Get a sequence on namespaces containing the migrations on a given folder path"
   [path]
   (when path
-    (let [ns (->> (string/split path #"/")
-                  rest
-                  (interpose ".")
-                  (apply str))]
+    (let [ns (drop-first-part path ".")]
       (->> (get-files path)
            (map second)
            (map #(re-matches #"(.*)(\.clj)$" %))
