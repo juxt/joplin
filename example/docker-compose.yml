@@ -35,6 +35,8 @@ zookeeper:
 
 datomic:
   build: datomic-docker
+  environment:
+    - TARGET_HOST $TARGET_HOST
   ports:
     - "4334:4334"
     - "4335:4335"

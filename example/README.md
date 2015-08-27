@@ -24,8 +24,15 @@ These alias map directly to the 5 core operations Joplin provides;
 
 For more information check out the joplin documentation.
 
-### IP / Hostnames
+### TARGET_HOST
 
-The examples comes with 2 hard-coded IPs that you probably need to change. This should the hostname (or IP) of your docker service.
+The examples project relies on an enviroment variable called `TARGET_HOST`. If you are on Linux this would be "127.0.0.1", if you are on Mac/Windows it will be the IP of the docker-machine VM.
 
-The files to change are `project.clj` and `datomic-docker/Dockerfile`
+To get the ip;
+`$ docker-machine ip <NAME>`.
+
+To set the environment variable do;
+
+```
+$ export TARGET_HOST=`docker-machine ip <NAME>`
+```
