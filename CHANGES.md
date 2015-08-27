@@ -20,6 +20,11 @@ Improved backwards compatability for :jdbc migrators
 
 Major rewrite with several breaking changes. [See here for details](https://github.com/juxt/joplin/wiki/Differences-between-0.2-and-0.3)
 
+## 0.2.17
+
+### Fixes
+* joplin.lein with leiningen 2.5.2
+
 ## 0.2.11
 
 ### Minor changes
