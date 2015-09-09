@@ -13,22 +13,8 @@
         (merge uri)
         (merge target))))
 
-(defn- remove-duplicates
-  "Remove duplicates that can occur when working with checked out dependencies"
-  [migrations]
-  (loop [[migration & migrations] migrations
-         added? #{}
-         out []]
-    (if (nil? migration)
-      out
-      (if (get added? (:id migration))
-        (recur migrations added? out)
-        (recur migrations
-               (conj added? (:id migration))
-               (conj out migration))))))
-
 (defn- get-sql-migrations [path]
-  (remove-duplicates
+  (distinct
    (or (seq (load-directory path))
        (seq (load-resources path))
        (seq (load-resources (drop-first-part path "/"))))))
