@@ -1,15 +1,15 @@
-(defproject joplin-example "0.3.4-SNAPSHOT"
+(defproject joplin-example "0.3.4"
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [joplin.core "0.3.4-SNAPSHOT"]
-                 [joplin.jdbc "0.3.4-SNAPSHOT"]
+                 [joplin.core "0.3.4"]
+                 [joplin.jdbc "0.3.4"]
                  [com.h2database/h2 "1.4.188"]
                  [org.postgresql/postgresql "9.4-1201-jdbc4"]
-                 [joplin.cassandra "0.3.4-SNAPSHOT"]
-                 [joplin.zookeeper "0.3.4-SNAPSHOT"]
-                 [joplin.elasticsearch "0.3.4-SNAPSHOT"]
+                 [joplin.cassandra "0.3.4"]
+                 [joplin.zookeeper "0.3.4"]
+                 [joplin.elasticsearch "0.3.4"]
 
-                 [joplin.datomic "0.3.4-SNAPSHOT" :exclusions [joda-time]]
-                 [joplin.hive "0.3.4-SNAPSHOT"]
+                 [joplin.datomic "0.3.4" :exclusions [joda-time]]
+                 [joplin.hive "0.3.4"]
                  ]
   :aliases {"migrate" ["run" "-m" "alias/migrate"]
             "seed" ["run" "-m" "alias/seed"]
