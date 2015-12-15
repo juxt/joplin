@@ -5,12 +5,13 @@
                  [com.h2database/h2 "1.4.188"]
                  [org.postgresql/postgresql "9.4-1201-jdbc4"]
                  [joplin.cassandra "0.3.5-SNAPSHOT"]
+                 [joplin.dynamodb "0.3.5-SNAPSHOT"]
                  [joplin.zookeeper "0.3.5-SNAPSHOT"]
                  [joplin.elasticsearch "0.3.5-SNAPSHOT"]
-
                  [joplin.datomic "0.3.5-SNAPSHOT" :exclusions [joda-time]]
                  [joplin.hive "0.3.5-SNAPSHOT"]
                  ]
+
   :aliases {"migrate" ["run" "-m" "alias/migrate"]
             "seed" ["run" "-m" "alias/seed"]
             "rollback" ["run" "-m" "alias/rollback"]

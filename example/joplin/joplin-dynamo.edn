@@ -1,0 +1,4 @@
+{:migrators    {:dynamo-mig "joplin/migrators/dynamo"}
+ :seeds        {:dynamo-seed "seeds.dynamo/run"}
+ :databases    {:dynamo-dev {:type :dynamo, :access-key "foo", :secret-key "bar" :endpoint #envf ["http://%s:8000" TARGET_HOST]}}
+ :environments {:dev [{:db :dynamo-dev, :migrator :dynamo-mig, :seed :dynamo-seed}]}}

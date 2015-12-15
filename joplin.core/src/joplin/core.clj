@@ -214,4 +214,4 @@ or resource folders inside a jar on the classpath"
                          (-> (:migrator target) (string/split #"/") rest)
                          [ns-name]))) ns))
         (catch Exception e
-          (println "Error creating file %s" path))))))
+          (println "Error creating file" path))))))

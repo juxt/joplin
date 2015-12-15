@@ -8,7 +8,7 @@ Joplin tries to solve the problems that arise when dealing with complicated syst
 
 Joplin lets you declare your `databases`, `migrators`, `seed functions` up front and combine them into different `environments`. It can be used from the REPL, via a [leiningen](http://leiningen.org) aliases or be called programatically.
 
-Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch, Cassandra, Hive and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
+Joplin comes with plugins for SQL/JDBC databases, Datomic, ElasticSearch, Cassandra, DynamoDB, Hive and Zookeeper. It is built with extensibility in mind, adding more stores is done by a handful of multi-methods.
 
 Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 
@@ -16,6 +16,7 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 
 * joplin.core - database independent tools and functions for managing migrations and seeds
 * joplin.cassandra - migrate and seed [Cassandra](http://cassandra.apache.org) clusters
+* joplin.dynamodb - migrate and seed [DynamoDB](http://aws.amazon.com/dynamodb) clusters
 * joplin.datomic - migrate and seed [Datomic](http://datomic.com) databases
 * joplin.elasticsearch - migrate and seed [Elasticsearch](http://elasticsearch.org) clusters
 * joplin.hive - migrate and seed [Hive](https://hive.apache.org) tables using Avro
@@ -34,6 +35,7 @@ If you are not using Leiningen, add a dependency for the plugins of the database
 
 ```clojure
 :dependencies [[joplin.cassandra "0.3.4"]
+               [joplin.dynamodb "0.3.4"]
                [joplin.datomic "0.3.4"]
                [joplin.elasticsearch "0.3.4"]
                [joplin.hive "0.3.4"]

@@ -6,13 +6,14 @@
   (:import [java.io PushbackReader]))
 
 (def ^:const libs
-  {:dt   'joplin.datomic.database
-   :cass 'joplin.cassandra.database
-   :jdbc 'joplin.jdbc.database
-   :sql  'joplin.jdbc.database
-   :hive 'joplin.hive.database
-   :es   'joplin.elasticsearch.database
-   :zk   'joplin.zookeeper.database})
+  {:dt     'joplin.datomic.database
+   :cass   'joplin.cassandra.database
+   :dynamo 'joplin.dynamodb.database
+   :jdbc   'joplin.jdbc.database
+   :sql    'joplin.jdbc.database
+   :hive   'joplin.hive.database
+   :es     'joplin.elasticsearch.database
+   :zk     'joplin.zookeeper.database})
 
 (defn- require-joplin-ns
   "We need to require the namespaces to get the defmethod evaluated"
