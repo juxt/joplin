@@ -264,6 +264,10 @@ Provided database types and their respective plugins;
     <td>:cass</td>
     <td>joplin.cassandra.database</td>
   </tr>
+  <tr>
+    <td>:dynamo</td>
+    <td>joplin.dynamodb.database</td>
+  </tr>
 </table>
 
 Note that it's easy to [extend joplin](https://github.com/juxt/joplin/wiki/Adding-a-new-database-type) to handle more database types and thus introduce more valid database types.
