@@ -7,7 +7,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [joplin.core "0.3.5-SNAPSHOT"]
-                 [org.clojure/java.jdbc "0.4.1"]
+                 [org.clojure/java.jdbc "0.4.2"]
                  [org.apache.hadoop/hadoop-client "2.7.1"]
                  [org.apache.hive/hive-exec "1.2.1"]
                  [org.apache.hive/hive-jdbc "1.2.1"]

@@ -7,4 +7,4 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [joplin.core "0.3.5-SNAPSHOT"]
-                 [com.datomic/datomic-free "0.9.5206" :exclusions [joda-time]]])
+                 [com.datomic/datomic-free "0.9.5344" :exclusions [joda-time]]])
