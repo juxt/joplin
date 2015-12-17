@@ -8,11 +8,9 @@
 
 (defn- ensure-migration-schema
   [client]
-  (let [tables (set (far/list-tables client))]
-    (when-not (contains? tables :migrations)
-      (far/create-table client :migrations
-                        [:id :s]
-                        {:throughput {:read 1 :write 1}}))))
+  (far/ensure-table client :migrations
+                    [:id :s]
+                    {:throughput {:read 1 :write 1}}))
 
 ;; ============================================================================
 ;; Ragtime interface
