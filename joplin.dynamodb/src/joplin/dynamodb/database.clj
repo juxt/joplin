@@ -10,7 +10,8 @@
   [client]
   (far/ensure-table client :migrations
                     [:id :s]
-                    {:throughput {:read 1 :write 1}}))
+                    {:throughput {:read 1 :write 1}
+                     :block?     true}))
 
 ;; ============================================================================
 ;; Ragtime interface
