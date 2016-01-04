@@ -56,7 +56,7 @@
         seeds        (-> project :joplin :seeds)
         project      (add-joplin-deps project)
         run-args     (concat
-                       (when (re-find #"^2.5.2" (leiningen-version))
+                       (when (re-find #"^2.5.(?:[1-9][0-9]+|[2-9])" (leiningen-version))
                          ["--quote-args"])
                        ["-m" "joplin.main"
                         "-r" (get-require-string (get-db-types project))
