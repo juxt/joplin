@@ -1,5 +1,5 @@
-(defproject joplin.jdbc "0.3.5-SNAPSHOT"
-  :description "JDBC support for Joplin"
+(defproject joplin.dynamodb "0.3.6-SNAPSHOT"
+  :description "AWS Dynamodb support for Joplin"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
         :url "https://github.com/juxt/joplin"}
@@ -7,4 +7,4 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [joplin.core "0.3.6-SNAPSHOT"]
-                 [ragtime/ragtime.jdbc "0.5.2"]])
+                 [com.taoensso/faraday "1.8.0"]])

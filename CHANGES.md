@@ -1,3 +1,15 @@
+## 0.3.5
+
+## New features
+
+DynamoDB support
+
+## 0.3.4
+
+### Fixes
+
+Fix issue with duplicate .sql migrators
+
 ## 0.3.3
 
 ### Minor changes

@@ -1,4 +1,4 @@
-(defproject joplin "0.3.5-SNAPSHOT"
+(defproject joplin "0.3.6-SNAPSHOT"
   :description "Flexible datastore migration and seeding"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
@@ -8,4 +8,4 @@
   :dependencies [[org.clojure/clojure "1.7.0"]]
   :plugins [[lein-sub "0.3.0"]]
   :sub ["joplin.core" "joplin.jdbc" "joplin.elasticsearch" "joplin.zookeeper"
-        "joplin.datomic" "joplin.cassandra" "joplin.hive"])
+        "joplin.datomic" "joplin.cassandra" "joplin.dynamodb" "joplin.hive"])
