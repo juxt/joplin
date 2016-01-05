@@ -1,3 +1,9 @@
+## 0.3.6
+
+### Minor changes
+
+New namespace joplin.alias
+
 ## 0.3.5
 
 ## New features

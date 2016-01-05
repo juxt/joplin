@@ -28,19 +28,19 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 Add joplin.core as a dependency if you just want the database-independent core:
 
 ```clojure
-:dependencies [[joplin.core "0.3.5"]]
+:dependencies [[joplin.core "0.3.6"]]
 ```
 
 If you are not using Leiningen, add a dependency for the plugins of the databases you want to migrate;
 
 ```clojure
-:dependencies [[joplin.cassandra "0.3.5"]
-               [joplin.dynamodb "0.3.5"]
-               [joplin.datomic "0.3.5"]
-               [joplin.elasticsearch "0.3.5"]
-               [joplin.hive "0.3.5"]
-               [joplin.jdbc "0.3.5"]
-               [joplin.zookeeper "0.3.5"]]
+:dependencies [[joplin.cassandra "0.3.6"]
+               [joplin.dynamodb "0.3.6"]
+               [joplin.datomic "0.3.6"]
+               [joplin.elasticsearch "0.3.6"]
+               [joplin.hive "0.3.6"]
+               [joplin.jdbc "0.3.6"]
+               [joplin.zookeeper "0.3.6"]]
 ```
 
 ## Using Joplin
