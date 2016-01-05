@@ -124,7 +124,7 @@ Create a new migration scaffold file for a single database in an environment. Th
 
 ### Running migrations from the command line
 
-When you want to script your migrations requiring a REPL is not convenient. In this case you can use Leiningen aliases to provide command-line commands for the 5 operation above. The example project shows to do do this in the [project.clj](https://github.com/juxt/joplin/blob/master/example/project.clj#L14) and the [code the aliases uses](https://github.com/juxt/joplin/blob/master/example/src/alias.clj#L25).
+When you want to script your migrations requiring a REPL is not convenient. In this case you can use Leiningen aliases to provide command-line commands for the 5 operation above. The example project shows to do do this in the [project.clj](https://github.com/juxt/joplin/blob/master/example/project.clj#L15) and the [code the aliases uses](https://github.com/juxt/joplin/blob/master/joplin.core/src/joplin/alias.clj).
 
 #### Migration conflict strategies
 

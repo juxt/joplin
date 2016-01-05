@@ -12,12 +12,12 @@
                  [joplin.hive "0.3.6-SNAPSHOT"]
                  ]
 
-  :aliases {"migrate" ["run" "-m" "alias/migrate"]
-            "seed" ["run" "-m" "alias/seed"]
-            "rollback" ["run" "-m" "alias/rollback"]
-            "reset" ["run" "-m" "alias/reset"]
-            "pending" ["run" "-m" "alias/pending"]
-            "create" ["run" "-m" "alias/create"]}
+  :aliases {"migrate" ["run" "-m" "joplin.alias/migrate" "joplin.edn"]
+            "seed" ["run" "-m" "joplin.alias/seed" "joplin.edn"]
+            "rollback" ["run" "-m" "joplin.alias/rollback" "joplin.edn"]
+            "reset" ["run" "-m" "joplin.alias/reset" "joplin.edn"]
+            "pending" ["run" "-m" "joplin.alias/pending" "joplin.edn"]
+            "create" ["run" "-m" "joplin.alias/create" "joplin.edn"]}
 
   :resource-paths ["joplin"]
   :repl-options {:init-ns migrate
