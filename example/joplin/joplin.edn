@@ -9,6 +9,7 @@
              :hive-mig         "joplin/migrators/hive"
              :cass-mig         "joplin/migrators/cass"
              :dt-mig           "joplin/migrators/datomic"
+             :dynamo-mig       "joplin/migrators/dynamo"
              }
 
  :seeds     {:es-seed           "seeds.es/run"
@@ -17,6 +18,7 @@
              :cass-seed         "seeds.cass/run"
              :dt-seed           "seeds.dt/run"
              :zk-seed           "seeds.zk/run"
+             :dynamo-seed       "seeds.dynamo/run"
              }
 
  :databases {:dt-dev         {:type :dt, :host #envf ["datomic:free://%s:4334/test" TARGET_HOST]}
@@ -36,6 +38,7 @@
              :psql-prod      {:type :sql, :url #envf ["jdbc:postgresql://psq-prod/prod?user=%s&password=%s" PROD_USER PROD_PASSWD]}
 
              :hive-dev       {:type :hive, :host #env TARGET_HOST, :subnamef "//%s:10000/default"}
+             :dynamo-dev {:type :dynamo, :access-key "foo", :secret-key "bar" :endpoint #envf ["http://%s:8000" TARGET_HOST]}
              }
 
  :environments {:dev  [{:db :dt-dev, :migrator :dt-mig, :seed :dt-seed}
@@ -53,6 +56,7 @@
                        {:db :es-dev-data, :migrator :es-data-mig}
 
                        {:db :hive-dev, :migrator :hive-mig}
+                       {:db :dynamo-dev, :migrator :dynamo-mig, :seed :dynamo-seed}
                        ]
 
                 :prod [{:db :zk-prod}
