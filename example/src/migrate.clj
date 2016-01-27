@@ -1,5 +1,5 @@
 (ns migrate
-  (:require [alias :refer [load-config]]
+  (:require [joplin.alias :refer [*load-config*]]
             [clojure.java.io :as io]
             [joplin.repl :as repl
              :refer [migrate rollback seed reset create pending]]
@@ -9,7 +9,7 @@
   (println "Welcome to Joplin!")
   (println "From this REPL you can try to migrate a lots of different datastores")
   (println " ")
-  (def config (load-config "joplin.edn"))
+  (def config (*load-config* "joplin.edn"))
   (println "The config is loaded into the var 'config'")
   (println "Please remember that you need to set the environment variable 'TARGET_HOST' for all the migrators to work properly")
   (println " ")
