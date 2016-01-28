@@ -7,4 +7,4 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [joplin.core "0.3.7-SNAPSHOT"]
-                 [com.taoensso/faraday "1.8.0"]])
+                 [com.taoensso/faraday "1.9.0-beta1"]])
