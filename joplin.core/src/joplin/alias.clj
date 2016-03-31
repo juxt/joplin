@@ -33,7 +33,7 @@
     (when (and db num)
       (repl/rollback conf
                      (keyword env) (keyword db)
-                     (Long/parseLong num))))
+                     num)))
   (System/exit 0))
 
 (defn reset [config-file env & [db]]
