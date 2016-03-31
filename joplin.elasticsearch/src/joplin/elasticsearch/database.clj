@@ -107,8 +107,8 @@
 ;; ============================================================================
 ;; Functions for use within migrations
 
-(defn client [{:keys [host port]}]
-  (es/connect (str "http://" host ":" port)))
+(defn client [{:keys [scheme host port] :or {scheme "http"}}]
+  (es/connect (str scheme "://" host ":" port)))
 
 (defn native-client [{:keys [host port native-port cluster]}]
   (let [es-port (or native-port port)]
