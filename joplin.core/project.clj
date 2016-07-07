@@ -1,4 +1,4 @@
-(defproject joplin.core "0.3.7-SNAPSHOT"
+(defproject joplin.core "0.3.7"
   :description "Flexible datastore migration and seeding"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
@@ -6,7 +6,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :pedantic? :abort
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/java.classpath "0.2.3"]
-                 [clj-time "0.11.0"]
-                 [ragtime/ragtime.core "0.5.2"]])
+                 [clj-time "0.12.0"]
+                 [ragtime/ragtime.core "0.6.1"]])
