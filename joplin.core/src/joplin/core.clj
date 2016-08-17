@@ -169,21 +169,23 @@ or resource folders inside a jar on the classpath"
   [migrations db target & args]
   (println "Seeding" db)
   (when-let [seed-fn (and (:seed target) (get-fn (load-var (:seed target))))]
-    (let [pending-migrations (get-pending-migrations db migrations)]
-
+    (let [skip-migration-check? (:skip-migration-check? (first args))
+          pending-migrations (if skip-migration-check?
+                               []
+                               (get-pending-migrations db migrations))]
       (cond
-       (not-empty pending-migrations)
-       (do
-         (printf "There are %d pending migration(s)\n" (count pending-migrations))
-         (println pending-migrations))
+        (not-empty pending-migrations)
+        (do
+          (printf "There are %d pending migration(s)\n" (count pending-migrations))
+          (println pending-migrations))
 
-       seed-fn
-       (do
-         (printf "Applying seed function %s\n" seed-fn)
-         (apply seed-fn target args))
+        seed-fn
+        (do
+          (printf "Applying seed function %s\n" seed-fn)
+          (apply seed-fn target args))
 
-       :else
-       (printf "Skipping %s\n" (:seed target))))))
+        :else
+        (printf "Skipping %s\n" (:seed target))))))
 
 (defn do-pending-migrations [db migrations]
   (println "Pending migrations" (get-pending-migrations db migrations)))
