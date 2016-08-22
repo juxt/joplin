@@ -36,3 +36,23 @@ To set the environment variable do;
 ```
 $ export TARGET_HOST=`docker-machine ip <NAME>`
 ```
+
+### Command line usage examples
+
+Pending - lein pending [env db]
+```
+lein pending dev dynamo-dev
+```
+
+Migrate - lein migrate [env]
+```
+lein migrate dev
+```
+
+Rollback x iteration - lein rollback [env db amount-or-id]
+```
+lein rollback dev dynamo-dev 1
+```
+Rollback to specific migration - lein rollback [env db amount-or-id]
+```
+lein rollback dev dynamo-dev 20151215114952-users
