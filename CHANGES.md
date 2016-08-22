@@ -1,3 +1,9 @@
+## 0.3.8
+
+### Minor changes
+
+Added option to skip migration check before running seed function
+
 ## 0.3.6
 
 ### Minor changes
