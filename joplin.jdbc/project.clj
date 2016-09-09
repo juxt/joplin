@@ -7,4 +7,4 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [joplin.core "0.3.8"]
-                 [ragtime/ragtime.jdbc "0.6.1"]])
+                 [ragtime/ragtime.jdbc "0.6.3"]])
