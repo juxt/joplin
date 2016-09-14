@@ -202,7 +202,7 @@ or resource folders inside a jar on the classpath"
       (println "creating" path)
       (try
         (spit path (format "(ns %s
-  (:use [%s]))
+  (:require [%s :refer :all]))
 
 (defn up [db]
   ;; TODO - up migration code here
