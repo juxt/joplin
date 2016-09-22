@@ -1,4 +1,12 @@
+## 0.3.9
+
+### Breaking changes
+
+* joplin.cassandra now uses alia & hayt instead of cassaforte
+
 ## 0.3.8
+
+* ragtime/ragtime 0.6.3
 
 ### Minor changes
 
