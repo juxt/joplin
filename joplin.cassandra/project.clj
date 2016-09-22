@@ -1,4 +1,4 @@
-(defproject joplin.cassandra "0.3.9"
+(defproject joplin.cassandra "0.3.10-SNAPSHOT"
   :description "Cassandra support for Joplin"
   :url "http://github.com/juxt/joplin"
   :scm {:name "git"
@@ -6,6 +6,6 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [joplin.core "0.3.9"]
+                 [joplin.core "0.3.10-SNAPSHOT"]
                  [cc.qbits/alia "3.1.10"]
                  [cc.qbits/hayt "3.2.0"]])
