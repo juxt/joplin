@@ -107,10 +107,15 @@
 ;; ============================================================================
 ;; Functions for use within migrations
 
-(defn client [{:keys [scheme host port] :or {scheme "http"}}]
-  (es/connect (str scheme "://" host ":" port)))
+(defn client [{:keys [scheme host port user password]
+               :or {scheme "http"}
+               :as db}]
+  (es/connect (str scheme "://" host ":" port)
+              (merge {}
+                     (when (and user password)
+                       {:basic-auth [user password]}))))
 
-(defn native-client [{:keys [host port native-port cluster]}]
+(defn native-client [{:keys [host port native-port cluster] :as db}]
   (let [es-port (or native-port port)]
     (if cluster
       (esn/connect [[host es-port]] {"cluster.name" cluster})
