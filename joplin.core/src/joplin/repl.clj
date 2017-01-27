@@ -2,7 +2,8 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [joplin.core :refer [migrate-db rollback-db seed-db pending-migrations
-                                 create-migration]])
+                                 create-migration]]
+            [aero.core :refer [read-config]])
   (:import [java.io PushbackReader]))
 
 (def ^:const libs
@@ -43,11 +44,7 @@
 (defn- run-op [f targets args] (doseq [t targets] (apply f t args)))
 
 (defn load-config [r]
-  (edn/read {:readers {'env (fn [x] (System/getenv (str x)))
-                       'envf (fn [[fmt & args]]
-                               (apply format fmt
-                                      (map #(System/getenv (str %)) args)))}}
-            (PushbackReader. (io/reader r))))
+  (read-config r))
 
 (defn migrate [conf env & args]
   (require-joplin-ns conf)
