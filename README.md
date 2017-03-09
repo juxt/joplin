@@ -22,6 +22,7 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 * joplin.hive - migrate and seed [Hive](https://hive.apache.org) tables using Avro
 * joplin.jdbc - migrate and seed SQL databases with jdbc
 * joplin.zookeeper - seed [Zookeeper](http://zookeeper.apache.org) clusters
+* [clj-rethinkdb-migrations](https://github.com/apa512/clj-rethinkdb-migrations) - migrate and seed [RethinkDB](https://www.rethinkdb.com/) clusters
 
 ## Installation
 
