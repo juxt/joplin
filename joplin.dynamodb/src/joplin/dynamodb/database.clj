@@ -7,8 +7,8 @@
             [taoensso.faraday :as far]))
 
 (defn- ensure-migration-schema
-  [client]
-  (far/ensure-table client :migrations
+  [client migration-table]
+  (far/ensure-table client migration-table
                     [:id :s]
                     {:throughput {:read 1 :write 1}
                      :block?     true}))
@@ -16,24 +16,26 @@
 ;; ============================================================================
 ;; Ragtime interface
 
-(defrecord DynamoDatabase [access-key secret-key endpoint]
-    DataStore
+(defrecord DynamoDatabase [access-key secret-key endpoint migration-table]
+  DataStore
   (add-migration-id [db id]
-    (ensure-migration-schema db)
-    (far/put-item db :migrations
+    (ensure-migration-schema db migration-table)
+    (far/put-item db migration-table
                   {:id         id
                    :created-at (tc/to-long (t/now))}))
   (remove-migration-id [db id]
-    (ensure-migration-schema db)
-    (far/delete-item db :migrations {:id id}))
+    (ensure-migration-schema db migration-table)
+    (far/delete-item db migration-table {:id id}))
   (applied-migration-ids [db]
-    (ensure-migration-schema db)
-    (->> (far/scan db :migrations)
+    (ensure-migration-schema db migration-table)
+    (->> (far/scan db migration-table)
          (sort-by :created-at)
          (map :id))))
 
 (defn- ->DynamoDatabase [target]
-  (map->DynamoDatabase (select-keys (:db target) [:access-key :secret-key :endpoint])))
+  (map->DynamoDatabase (-> (:db target)
+                           (select-keys [:access-key :secret-key :endpoint :migration-table])
+                           (update :migration-table #(or % :migrations)))))
 
 ;; ============================================================================
 ;; Joplin interface
