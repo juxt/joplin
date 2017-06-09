@@ -23,6 +23,7 @@ Joplin is built on top of [ragtime](https://github.com/weavejester/ragtime).
 * joplin.jdbc - migrate and seed SQL databases with jdbc
 * joplin.zookeeper - seed [Zookeeper](http://zookeeper.apache.org) clusters
 * [clj-rethinkdb-migrations](https://github.com/apa512/clj-rethinkdb-migrations) - migrate and seed [RethinkDB](https://www.rethinkdb.com/) clusters
+* [joplin.mongodb](https://github.com/razum2um/joplin.mongodb) - migrate and seed [MongoDB](http://mongodb.com/)
 
 ## Installation
 
