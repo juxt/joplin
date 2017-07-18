@@ -5,7 +5,8 @@
             [ragtime.protocols :refer [DataStore]]))
 
 (defn- append-uri [target]
-  (let [uri {:connection-uri (:url (:db target))}]
+  (let [url (:url (:db target))
+        uri (if url {:connection-uri url})]
     (-> (merge {:migrations-table "ragtime_migrations"}
                (:db target))
         (select-keys [:url :datasource :migrations-table])
