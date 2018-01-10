@@ -11,7 +11,10 @@
              [core]
              [protocols]
              [repl]
-             [strategy]]))
+             [strategy]])
+  (:import
+   [java.io File]
+   [java.util.jar JarFile]))
 
 ;; ==========================================================================
 ;; methods implemented by migrator/seed targets
@@ -70,6 +73,17 @@ The first argument must be the name of the migration to create"
        (interpose delimiter)
        (apply str)))
 
+(defn- classpath-directories []
+  (filter #(and
+            (instance? File %)
+            (.isDirectory ^File %))
+          (classpath/system-classpath)))
+
+(defn- classpath-jarfiles []
+  (->> (classpath/system-classpath)
+       (filter classpath/jar-file?)
+       (map #(java.util.jar.JarFile. ^java.io.File %))))
+
 (defn- get-files
   "Get migrations files given a folder path.
 Will try to locate files on the local filesystem, folder on the classpath
@@ -77,28 +91,28 @@ or resource folders inside a jar on the classpath"
   [path]
   (let [local-folder          (io/file path)
         classpath-folder-name (drop-first-part path "/")
-        folder-on-classpath   (->> (classpath/classpath-directories)
-                                   (map #(str (.getPath %) "/" classpath-folder-name))
+        folder-on-classpath   (->> (classpath-directories)
+                                   (map #(str (.getPath ^File %) "/" classpath-folder-name))
                                    (map io/file)
-                                   (filter #(.isDirectory %))
+                                   (filter #(.isDirectory ^File %))
                                    first)]
 
     (cond
      ;; If it's a local folder just read the file from there
      (.isDirectory local-folder)
      (->> (.listFiles local-folder)
-          (map #(vector % (.getName %))))
+          (map #(vector % (.getName ^File %))))
 
      ;; If it's a folder on the classpath use that
      folder-on-classpath
-     (->> (.listFiles folder-on-classpath)
-          (map #(vector % (.getName %))))
+     (->> (.listFiles ^File folder-on-classpath)
+          (map #(vector % (.getName ^File %))))
 
      ;; Try finding this path inside a jar on the classpath
      :else
-     (->> (classpath/classpath-jarfiles)
+     (->> (classpath-jarfiles)
           (mapcat classpath/filenames-in-jar)
-          (filter #(.startsWith % classpath-folder-name))
+          (filter #(.startsWith ^String % classpath-folder-name))
           (map #(vector (io/resource %) (.getName (io/file %))))))))
 
 (defn- get-migration-namespaces
