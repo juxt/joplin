@@ -3,8 +3,7 @@
             [qbits.hayt :as hayt]
             [joplin.core :refer :all]
             [ragtime.protocols :refer [DataStore]])
-  (:import com.datastax.driver.core.exceptions.AlreadyExistsException
-           com.datastax.driver.core.SessionManager))
+  (:import com.datastax.driver.core.SessionManager))
 
 ;; =============================================================
 
@@ -25,12 +24,6 @@
 
 (defn get-connection [db]
   (alia/connect (alia/cluster (cluster-configuration db)) (:keyspace db)))
-
-(defn with-connection [db f]
-  (when-let [conn (get-connection db)]
-    (try
-      (f conn)
-      (finally (alia/shutdown conn)))))
 
 ;; ============================================================================
 ;; Ragtime interface
