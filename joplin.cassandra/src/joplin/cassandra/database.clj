@@ -17,11 +17,16 @@
                                                              :created_at  :timestamp
                                                              :primary-key [:id]}))))
 
-(defn get-connection [hosts keyspace]
-  (alia/connect (alia/cluster {:contact-points hosts}) keyspace))
+(defn- cluster-configuration
+  [{:keys [hosts credentials] :as cass-db}]
+  {:contact-points hosts
+   :credentials credentials})
 
-(defn with-connection [hosts keyspace f]
-  (when-let [conn (get-connection hosts keyspace)]
+(defn get-connection [db]
+  (alia/connect (alia/cluster (cluster-configuration db)) (:keyspace db)))
+
+(defn with-connection [db f]
+  (when-let [conn (get-connection db)]
     (try
       (f conn)
       (finally (alia/shutdown conn)))))
@@ -32,14 +37,14 @@
 (defrecord CassandraDatabase [hosts keyspace]
   DataStore
   (add-migration-id [db id]
-    (with-connection hosts keyspace
+    (with-connection db
       (fn [conn]
         (ensure-migration-schema conn)
         (alia/execute conn
                       (hayt/insert :migrations
                                    (hayt/values {:id id, :created_at (java.util.Date.)}))))))
   (remove-migration-id [db id]
-    (with-connection hosts keyspace
+    (with-connection db
       (fn [conn]
         (ensure-migration-schema conn)
         (alia/execute conn
@@ -47,7 +52,7 @@
                                    (hayt/where {:id id}))))))
 
   (applied-migration-ids [db]
-    (with-connection hosts keyspace
+    (with-connection db
       (fn [conn]
         (ensure-migration-schema conn)
         (->> (alia/execute conn
@@ -56,7 +61,7 @@
              (map :id))))))
 
 (defn- ->CassDatabase [target]
-  (map->CassandraDatabase (select-keys (:db target) [:hosts :keyspace])))
+  (map->CassandraDatabase (:db target)))
 
 ;; ============================================================================
 ;; Joplin interface
