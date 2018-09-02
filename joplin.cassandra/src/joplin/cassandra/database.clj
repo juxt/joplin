@@ -3,7 +3,8 @@
             [qbits.hayt :as hayt]
             [joplin.core :refer :all]
             [ragtime.protocols :refer [DataStore]])
-  (:import com.datastax.driver.core.exceptions.AlreadyExistsException))
+  (:import com.datastax.driver.core.exceptions.AlreadyExistsException
+           com.datastax.driver.core.SessionManager))
 
 ;; =============================================================
 
@@ -34,53 +35,48 @@
 ;; ============================================================================
 ;; Ragtime interface
 
-(defrecord CassandraDatabase [hosts keyspace]
-  DataStore
-  (add-migration-id [db id]
-    (with-connection db
-      (fn [conn]
-        (ensure-migration-schema conn)
-        (alia/execute conn
-                      (hayt/insert :migrations
-                                   (hayt/values {:id id, :created_at (java.util.Date.)}))))))
-  (remove-migration-id [db id]
-    (with-connection db
-      (fn [conn]
-        (ensure-migration-schema conn)
-        (alia/execute conn
-                      (hayt/delete :migrations
-                                   (hayt/where {:id id}))))))
+(extend-protocol DataStore
+  SessionManager
+  (add-migration-id [this id]
+    (ensure-migration-schema this)
+    (alia/execute this
+                  (hayt/insert :migrations
+                               (hayt/values {:id id, :created_at (java.util.Date.)}))))
+  (remove-migration-id [this id]
+    (ensure-migration-schema this)
+    (alia/execute this
+                  (hayt/delete :migrations
+                               (hayt/where {:id id}))))
 
-  (applied-migration-ids [db]
-    (with-connection db
-      (fn [conn]
-        (ensure-migration-schema conn)
-        (->> (alia/execute conn
-                           (hayt/select :migrations))
-             (sort-by :created_at)
-             (map :id))))))
-
-(defn- ->CassDatabase [target]
-  (map->CassandraDatabase (:db target)))
+  (applied-migration-ids [this]
+    (ensure-migration-schema this)
+    (->> (alia/execute this
+                       (hayt/select :migrations))
+         (sort-by :created_at)
+         (map :id))))
 
 ;; ============================================================================
 ;; Joplin interface
 
 (defmethod migrate-db :cass [target & args]
-  (apply do-migrate (get-migrations (:migrator target))
-         (->CassDatabase target) args))
+  (with-open [conn (get-connection (:db target))]
+    (apply do-migrate (get-migrations (:migrator target))
+           conn args)))
 
 (defmethod rollback-db :cass [target amount-or-id & args]
-  (apply do-rollback (get-migrations (:migrator target))
-         (->CassDatabase target) amount-or-id args))
+  (with-open [conn (get-connection (:db target))]
+    (apply do-rollback (get-migrations (:migrator target))
+           conn amount-or-id args)))
 
 (defmethod seed-db :cass [target & args]
-  (apply do-seed-fn (get-migrations (:migrator target))
-         (->CassDatabase target) target args))
+  (with-open [conn (get-connection (:db target))]
+    (apply do-seed-fn (get-migrations (:migrator target))
+           conn target args)))
 
 (defmethod pending-migrations :cass [target & args]
-  (do-pending-migrations (->CassDatabase target)
-                         (get-migrations (:migrator target))))
+  (with-open [conn (get-connection (:db target))]
+    (do-pending-migrations conn
+                           (get-migrations (:migrator target)))))
 
 (defmethod create-migration :cass [target id & args]
   (do-create-migration target id "joplin.cassandra.database"))
