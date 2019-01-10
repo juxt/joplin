@@ -18,8 +18,10 @@
                                                              :primary-key [:id]}))))
 
 (defn- cluster-configuration
-  [{:keys [hosts credentials] :as cass-db}]
+  [{:keys [hosts credentials port] :as cass-db
+    :or {port 9042}}]
   {:contact-points hosts
+   :port port
    :credentials credentials})
 
 (defn get-connection [db]
