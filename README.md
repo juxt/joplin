@@ -70,7 +70,7 @@ Example of a joplin definition;
 ;; We combine the definitions above into different environments
 :environments {:dev [{:db :sql-dev, :migrator :sql-mig, :seed :sql-seed}]
                :prod [{:db :sql-prod, :migrator :sql-mig}
-                      {:db :es-prod}, :seed :es-seed]}
+                      {:db :es-prod, :seed :es-seed}]}
 }
 ```
 
